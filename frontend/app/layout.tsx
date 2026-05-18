@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/", label: "Dashboard" },
+  { href: "/",           label: "Dashboard" },
   { href: "/controlled", label: "L3 · Controlled GenUI" },
   { href: "/declarative", label: "L4 · Declarative GenUI" },
-  { href: "/open", label: "L5 · Open GenUI" },
+  { href: "/open",       label: "L5 · Open GenUI" },
+  { href: "/hitl",       label: "HITL · Approvals" },
 ];
 
 export default function RootLayout({

@@ -1,19 +1,21 @@
-// L5 demo: Open Generative UI (openGenerativeUI + MCP)
-// (Implementation will be added after planning)
-
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
+import { CopilotTextarea } from "@copilotkit/react-textarea";
 import { useCopilotAction } from "@copilotkit/react-core";
+import { useState } from "react";
 
 /**
- * L5 · Open Generative UI.
- * No pre-declared, typed components. We expose a single very generic
- * "renderMarkdown" action and let the agent stream rich markdown that
- * renders inline in the chat (CopilotKit auto-renders markdown).
- * For real MCP / open GenUI you'd wire openGenerativeUI here.
+ * L5 · Open Generative UI + CopilotTextarea.
+ *
+ * 1. renderMarkdown action — lets the agent stream rich markdown inline
+ *    in the chat (open / free-form GenUI).
+ * 2. CopilotTextarea — AI-enhanced textarea with autocomplete suggestions
+ *    powered by the same CopilotKit context.
  */
 export default function OpenGenUIPage() {
+  const [textareaValue, setTextareaValue] = useState("");
+
   useCopilotAction({
     name: "renderMarkdown",
     description:
@@ -32,27 +34,66 @@ export default function OpenGenUIPage() {
   });
 
   return (
-    <div className="grid md:grid-cols-[1fr,420px] gap-6">
-      <div className="space-y-4">
-        <header>
-          <h1 className="text-2xl font-bold">L5 · Open Generative UI</h1>
-          <p className="text-slate-600 mt-1 max-w-2xl">
-            The agent is free to render arbitrary inline UI via{" "}
-            <code>renderMarkdown</code>. Combine with MCP tools on the
-            backend for truly open generative experiences.
-          </p>
-        </header>
-        <div className="rounded-xl border border-dashed border-slate-300 p-6 text-slate-500">
-          Inline generative output will appear inside the chat on the right.
-        </div>
-      </div>
+    <div className="space-y-8">
+      {/* ── Header ── */}
+      <header>
+        <h1 className="text-2xl font-bold">L5 · Open Generative UI + CopilotTextarea</h1>
+        <p className="text-slate-600 mt-1 max-w-2xl">
+          Two features in one page:
+          <br />
+          <strong>1. Open GenUI</strong> — the agent renders arbitrary markdown inline via{" "}
+          <code>renderMarkdown</code>.
+          <br />
+          <strong>2. CopilotTextarea</strong> — an AI-enhanced textarea with live
+          autocomplete suggestions based on your CopilotKit context.
+        </p>
+      </header>
 
-      <div className="h-[70vh] rounded-xl border border-slate-200 bg-white overflow-hidden">
-        <CopilotChat
-          instructions="You can call renderMarkdown to draw any inline UI/markdown for the user. Use it liberally for summaries, plans, and tables."
-          labels={{ title: "Open GenUI", initial: "Ask me anything!" }}
+      {/* ── CopilotTextarea demo ── */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6 space-y-3">
+        <h2 className="font-semibold text-slate-800 text-lg">
+          ✏️ CopilotTextarea — AI-Enhanced Text Input
+        </h2>
+        <p className="text-sm text-slate-500">
+          Start typing a business report or email. CopilotKit will suggest
+          completions based on the active domain context. Press{" "}
+          <kbd className="px-1 py-0.5 text-xs bg-slate-100 border rounded">Tab</kbd> to accept.
+        </p>
+        <CopilotTextarea
+          value={textareaValue}
+          onValueChange={setTextareaValue}
+          placeholder="Start typing a business summary, email draft, or analysis…"
+          className="w-full min-h-[140px] rounded-lg border border-slate-300 p-3 text-sm text-slate-800 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          autosuggestionsConfig={{
+            textareaPurpose:
+              "Business report or summary for Finance, HR, Healthcare, or Wireless domain analysis.",
+            chatApiConfigs: {},
+          }}
         />
-      </div>
+        {textareaValue && (
+          <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 font-mono whitespace-pre-wrap">
+            <span className="font-semibold text-slate-400 block mb-1">Current value:</span>
+            {textareaValue}
+          </div>
+        )}
+      </section>
+
+      {/* ── Open GenUI Chat ── */}
+      <section className="space-y-3">
+        <h2 className="font-semibold text-slate-800 text-lg">
+          💬 Open Generative UI Chat
+        </h2>
+        <p className="text-sm text-slate-500">
+          The agent renders arbitrary markdown inline. Try:{" "}
+          <em>"Give me a formatted report on the healthcare domain"</em>.
+        </p>
+        <div className="h-[60vh] rounded-xl border border-slate-200 bg-white overflow-hidden">
+          <CopilotChat
+            instructions="You can call renderMarkdown to draw any inline UI/markdown for the user. Use it liberally for summaries, plans, and tables. Format responses as clean, structured markdown."
+            labels={{ title: "Open GenUI", initial: "Ask me anything! I'll render rich markdown inline." }}
+          />
+        </div>
+      </section>
     </div>
   );
 }

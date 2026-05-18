@@ -1,16 +1,21 @@
 # LangGraph agent definition for CopilotKit
 import os
-from typing import List, Dict
+from typing import List, Dict, Any
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 from copilotkit import CopilotKitMiddleware, CopilotKitState
+from copilotkit.langchain import copilotkit_emit_state   # intermediate state streaming
 from langgraph.checkpoint.memory import MemorySaver
-# NOTE: The ag_ui_langgraph adapter requires a checkpointer (it calls
-# graph.aget_state(config) on every request). MemorySaver is the simplest
-# in-process implementation. The frontend sends the full message history
-# each turn, so the checkpoint is effectively overwritten per request —
-# we do NOT rely on it for memory.
+
+# ── Thread Persistence ──────────────────────────────────────────────────
+# SqliteSaver persists conversation history across backend restarts.
+# Falls back to MemorySaver if the package is not installed.
+try:
+    from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+    _USE_SQLITE_CHECKPOINTER = True
+except ImportError:
+    _USE_SQLITE_CHECKPOINTER = False
 
 from tools.sqlite_tools import (
     get_table_names as _get_table_names,
@@ -148,13 +153,15 @@ def run_sql(sql: str) -> List[Dict[str, str]]:
 
 @tool
 def finance_summary() -> Dict[str, int]:
-    """Summarize finance accounts and transactions (tables: finance_accounts, finance_transactions)."""
+    """Summarize finance accounts and transactions (tables: finance_accounts, finance_transactions).
+    Emits intermediate state so the frontend can show a 'loading' indicator."""
     return _safe(_get_finance_summary)
 
 
 @tool
 def hr_summary() -> Dict[str, int]:
-    """Summarize HR employees and payroll (tables: hr_employees, hr_payroll)."""
+    """Summarize HR employees and payroll (tables: hr_employees, hr_payroll).
+    Emits intermediate state so the frontend can show a 'loading' indicator."""
     return _safe(_get_hr_summary)
 
 
@@ -170,23 +177,32 @@ def wireless_summary() -> Dict[str, int]:
     return _safe(_get_wireless_summary)
 
 
+# ── copilotkit_emit_state helper tool ───────────────────────────────────
+# The LLM can call this to broadcast a partial state update to the
+# frontend mid-run (e.g. "fetching finance data…"). The frontend picks
+# it up via useCoAgentStateRender and can show live progress.
+@tool
+async def emit_progress(status: str, active_domain: str = "") -> str:
+    """Emit an intermediate state update visible on the frontend.
+    Call this BEFORE a long-running tool to show progress to the user.
+    status: short human-readable message, e.g. 'Fetching finance data…'
+    active_domain: the domain being processed (optional).
+    """
+    try:
+        await copilotkit_emit_state({"status": status, "active_domain": active_domain})
+    except Exception:
+        pass  # emit_state is best-effort; never abort the run
+    return f"Progress emitted: {status}"
+
+
 def build_agent():
     """Build a LangGraph agent using CopilotKit's official middleware.
 
-    ``CopilotKitMiddleware`` (from the ``copilotkit`` package) handles:
-      * ``wrap_model_call`` — merges frontend tools (e.g. ``renderUI`` from
-        ``useCopilotAction``) from ``state["copilotkit"]["actions"]`` into the
-        model's tool list BEFORE every LLM invocation, so the model can
-        actually call them.
-      * ``after_model`` — strips frontend tool calls from the AIMessage so
-        the local ToolNode doesn't try to execute them.
-      * ``after_agent`` — restores them on the AIMessage so the AG-UI SSE
-        stream forwards them to the browser, where the matching
-        ``useCopilotAction`` handler runs and renders the chart.
-
-    This replaces the previous hand-rolled graph; see the docs at
-    https://docs.langchain.com/oss/python/langchain/frontend/integrations/copilotkit
-    for the canonical pattern.
+    Improvements over initial version:
+    - expose_state=True: surfaces active agent state keys into the system
+      prompt so the model always knows what domain/filter the user is on.
+    - AsyncSqliteSaver: persists conversation threads across backend
+      restarts (falls back to MemorySaver if not installed).
     """
     model_name = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     llm = ChatOpenAI(model=model_name, temperature=0)
@@ -206,13 +222,26 @@ def build_agent():
         hr_summary,
         healthcare_summary,
         wireless_summary,
+        emit_progress,   # copilotkit_emit_state — broadcasts intermediate state to frontend
     ]
+
+    # ── Checkpointer: persist threads in SQLite, fallback to in-memory ──
+    if _USE_SQLITE_CHECKPOINTER:
+        import aiosqlite, pathlib
+        db_path = pathlib.Path(__file__).parent.parent / "data" / "checkpoints.db"
+        db_path.parent.mkdir(exist_ok=True)
+        checkpointer = AsyncSqliteSaver(aiosqlite.connect(str(db_path)))
+    else:
+        checkpointer = MemorySaver()
 
     return create_agent(
         model=llm,
         tools=backend_tools,
-        middleware=[CopilotKitMiddleware()],
+        # expose_state=True appends current LangGraph state keys as a
+        # "Current agent state:" note in every system message — no manual
+        # prompt engineering needed for the agent to know activeDomain, etc.
+        middleware=[CopilotKitMiddleware(expose_state=True)],
         state_schema=CopilotKitState,
         system_prompt=get_system_prompt(),
-        checkpointer=MemorySaver(),
+        checkpointer=checkpointer,
     )

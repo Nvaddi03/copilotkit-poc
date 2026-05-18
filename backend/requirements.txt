@@ -4,6 +4,8 @@ copilotkit
 ag-ui-protocol
 langchain
 langgraph
+langgraph-checkpoint-sqlite
+aiosqlite
 langchain-openai
 python-dotenv
 faker

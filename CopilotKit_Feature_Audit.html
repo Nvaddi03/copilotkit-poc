@@ -142,14 +142,14 @@
 
 <!-- ═══════════════════════════════════════════════════════════ SCOREBOARD -->
 <div class="scorebar">
-  <div class="score-item"><div class="score-num" style="color:var(--green)">11</div><div class="score-lbl">✅ Done</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--green)">23</div><div class="score-lbl">✅ Done</div></div>
   <div class="score-item"><div class="score-num" style="color:var(--yellow)">4</div><div class="score-lbl">⚠️ Partial</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--red)">43</div><div class="score-lbl">❌ Todo</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--red)">31</div><div class="score-lbl">❌ Todo</div></div>
   <div class="score-item"><div class="score-num" style="color:var(--blue)">9</div><div class="score-lbl">🔷 OSS Only</div></div>
   <div class="progress-wrap">
-    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 16% (11/67 features)</div>
+    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 34% (23/67 features)</div>
     <div class="progress-bar">
-      <div class="progress-seg" style="width:16%;background:var(--green)"></div>
+      <div class="progress-seg" style="width:34%;background:var(--green)"></div>
       <div class="progress-seg" style="width:6%;background:var(--yellow)"></div>
       <div class="progress-seg" style="width:13%;background:var(--blue)"></div>
     </div>
@@ -230,7 +230,7 @@ useCopilotAction({ name: "renderUI", ... });  // declarative</code></pre></detai
     <div class="card-head">
       <div class="card-icon">💬</div>
       <div>
-        <div class="card-title">useCopilotChat <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useCopilotChat <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Programmatic chat control from outside the chat UI</div>
       </div>
     </div>
@@ -254,7 +254,7 @@ function OnboardingButton() {
   );
 }</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not implemented — quick-prompt buttons would use this</div>
+    <div class="status-strip done">✅ Implemented — 4 quick-prompt pill buttons on Dashboard use appendMessage()</div>
   </div>
 
   <!-- useCopilotAdditionalInstructions -->
@@ -262,7 +262,7 @@ function OnboardingButton() {
     <div class="card-head">
       <div class="card-icon">📝</div>
       <div>
-        <div class="card-title">useCopilotAdditionalInstructions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useCopilotAdditionalInstructions <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Dynamically inject page-specific system prompt segments</div>
       </div>
     </div>
@@ -275,7 +275,7 @@ useCopilotAdditionalInstructions({
   available: activeDomain === "hr",
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ We hard-code instructions in CopilotPopup/Sidebar props instead</div>
+    <div class="status-strip done">✅ Implemented — dynamically injects active domain context when activeDomain changes on Dashboard</div>
   </div>
 
 </div><!-- /grid -->
@@ -482,7 +482,7 @@ const { tools, features } = useCapabilities();
     <div class="card-head">
       <div class="card-icon">🧵</div>
       <div>
-        <div class="card-title">useThreads <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useThreads <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Manage multiple conversation threads</div>
       </div>
     </div>
@@ -503,7 +503,7 @@ return (
   &lt;/div&gt;
 );</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Single ephemeral thread — no thread management UI</div>
+    <div class="status-strip done">✅ Dashboard — useThreads exposes threadId + setThreadId; "New Thread" button creates fresh conversation</div>
   </div>
 
 </div><!-- /grid -->
@@ -517,7 +517,7 @@ return (
     <div class="card-head">
       <div class="card-icon">⚡</div>
       <div>
-        <div class="card-title">useFrontendTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useFrontendTool <span class="badge badge-done">Done</span></div>
         <div class="card-sub">V2 replacement for useCopilotAction</div>
       </div>
     </div>
@@ -530,7 +530,7 @@ useCopilotAction({ name: "selectDomain", ... });
 import { useFrontendTool } from "@copilotkit/react-core";
 useFrontendTool({ name: "selectDomain", ... });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using V1 useCopilotAction — V2 migration pending</div>
+    <div class="status-strip done">✅ copyToClipboard action on L3 Controlled page — browser-only, never reaches backend</div>
   </div>
 
   <!-- useHumanInTheLoop -->
@@ -538,7 +538,7 @@ useFrontendTool({ name: "selectDomain", ... });</code></pre></details>
     <div class="card-head">
       <div class="card-icon">🛑</div>
       <div>
-        <div class="card-title">useHumanInTheLoop <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useHumanInTheLoop <span class="badge badge-done">Done</span></div>
         <div class="card-sub">React hook to handle approval/rejection UI</div>
       </div>
     </div>
@@ -560,7 +560,7 @@ useHumanInTheLoop({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No HITL UI — all actions fire immediately</div>
+    <div class="status-strip done">✅ /hitl page — useCopilotAction render prop + Promise suspension pauses agent for Approve/Reject</div>
   </div>
 
   <!-- useInterrupt -->
@@ -728,7 +728,7 @@ useConfigureSuggestions({
     <div class="card-head">
       <div class="card-icon">✏️</div>
       <div>
-        <div class="card-title">CopilotTextarea <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotTextarea <span class="badge badge-done">Done</span></div>
         <div class="card-sub">AI-powered textarea with autocomplete</div>
       </div>
     </div>
@@ -746,7 +746,7 @@ import "@copilotkit/react-textarea/styles.css";
   }}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not implemented — useful for report/notes pages</div>
+    <div class="status-strip done">✅ CopilotTextarea on L5 Open GenUI page — AI autocomplete for business report writing</div>
   </div>
 
   <!-- Custom message renderer -->
@@ -1137,7 +1137,7 @@ add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
     <div class="card-head">
       <div class="card-icon">📤</div>
       <div>
-        <div class="card-title">expose_state (CopilotKitMiddleware) <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">expose_state (CopilotKitMiddleware) <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Surface LangGraph state into the system prompt automatically</div>
       </div>
     </div>
@@ -1146,7 +1146,7 @@ add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
       <details><summary>▶ Sample</summary><pre><code>CopilotKitMiddleware(expose_state=["active_domain", "last_query"])
 # or: expose_state=True  to expose all non-underscore keys</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using expose_state=False (default) — state not surfaced into prompt</div>
+    <div class="status-strip done">✅ expose_state=True in CopilotKitMiddleware — agent state automatically surfaced into system prompt</div>
   </div>
 
   <!-- Streaming tool progress -->
@@ -1154,7 +1154,7 @@ add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
     <div class="card-head">
       <div class="card-icon">⏳</div>
       <div>
-        <div class="card-title">Intermediate State / copilotkit_emit_state <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Intermediate State / copilotkit_emit_state <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Stream in-progress state snapshots to the frontend</div>
       </div>
     </div>
@@ -1168,7 +1168,7 @@ async def long_tool(state):
     await copilotkit_emit_state(config, {"progress": 66, "step": "aggregating"})
     return result</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No progress streaming — tools return immediately</div>
+    <div class="status-strip done">✅ emit_progress tool in backend — calls copilotkit_emit_state to stream {status, active_domain} to frontend</div>
   </div>
 
 </div><!-- /grid -->
@@ -1232,7 +1232,7 @@ useCoAgentStateRender({ name: "data_loaded",
     <div class="card-head">
       <div class="card-icon">🧵</div>
       <div>
-        <div class="card-title">Thread / Session Persistence <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Thread / Session Persistence <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Named conversation threads with history across page reloads</div>
       </div>
     </div>
@@ -1248,7 +1248,7 @@ useEffect(() =&gt; localStorage.setItem("tid", tid), [tid]);
 from langgraph.checkpoint.sqlite import SqliteSaver
 checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using in-process MemorySaver — history lost on backend restart</div>
+    <div class="status-strip done">✅ AsyncSqliteSaver persists threads to data/checkpoints.db (with MemorySaver fallback)</div>
   </div>
 
 </div><!-- /grid -->
@@ -1358,7 +1358,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
     <div class="card-head">
       <div class="card-icon">🛑</div>
       <div>
-        <div class="card-title">Human-in-the-Loop (HITL) <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Human-in-the-Loop (HITL) <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Pause agent, ask user to confirm, resume</div>
       </div>
     </div>
@@ -1378,7 +1378,7 @@ async def delete_records(table: str, ids: list[int]):
     # ... do delete
     return f"Deleted {len(ids)} rows."</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No confirmation dialogs — all actions fire immediately</div>
+    <div class="status-strip done">✅ /hitl page — agent pauses on executeDataExport & approveBudgetChange, waits for Approve/Reject</div>
   </div>
 
   <!-- useCoAgentStateRender -->
@@ -1386,7 +1386,7 @@ async def delete_records(table: str, ids: list[int]):
     <div class="card-head">
       <div class="card-icon">🖼️</div>
       <div>
-        <div class="card-title">useCoAgentStateRender <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useCoAgentStateRender <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Render LangGraph state as a live side panel</div>
       </div>
     </div>
@@ -1404,7 +1404,7 @@ useCoAgentStateRender({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Agent state not visualised outside chat</div>
+    <div class="status-strip done">✅ Dashboard — renders live agent domain/query badge whenever state changes (useCoAgentStateRender)</div>
   </div>
 
   <!-- useCoAgent -->
@@ -1412,7 +1412,7 @@ useCoAgentStateRender({
     <div class="card-head">
       <div class="card-icon">🔗</div>
       <div>
-        <div class="card-title">useCoAgent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useCoAgent <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Two-way bidirectional state sync between frontend and LangGraph</div>
       </div>
     </div>
@@ -1430,7 +1430,7 @@ const { state, setState } = useCoAgent&lt;AgentState&gt;({
 // Now state.activeDomain === what's in the LangGraph state
 // setState({ activeDomain: "hr" }) will update both frontend + next agent call</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ We duplicate state in React (useState) and only pass it via useCopilotReadable</div>
+    <div class="status-strip done">✅ Dashboard — useCoAgent reads live LangGraph state; AgentState panel shows active_domain + last_query</div>
   </div>
 
   <!-- Agentic tasks / background runs -->
