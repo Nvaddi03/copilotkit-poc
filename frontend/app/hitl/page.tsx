@@ -1,7 +1,7 @@
 "use client";
 
 import { CopilotPopup } from "@copilotkit/react-ui";
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCopilotAction, useLangGraphInterrupt } from "@copilotkit/react-core";
 import { useRef, useState } from "react";
 
 /**
@@ -143,6 +143,37 @@ export default function HITLPage() {
       }
       setLog((p) => [`[${new Date().toLocaleTimeString()}] ✅ Budget approved: ${department} $${amount}`, ...p]);
       return `Budget change for ${department} ($${amount}) approved and applied.`;
+    },
+  });
+
+  // ── useLangGraphInterrupt ────────────────────────────────────────────
+  // Native LangGraph interrupt pattern — listens for __interrupt__ events
+  // from a LangGraph node and renders a custom approval UI.
+  // This is the V2 recommended approach when your graph uses interrupt().
+  useLangGraphInterrupt({
+    render: ({ event, resolve }) => {
+      const value = (event as any)?.value ?? (event as any)?.data ?? event;
+      const message = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+      return (
+        <div className="rounded-xl border-2 border-rose-400 bg-rose-50 p-5 space-y-3 shadow my-2">
+          <p className="text-rose-800 font-semibold">🛑 LangGraph Interrupt</p>
+          <p className="text-sm text-rose-700 font-mono whitespace-pre-wrap">{message}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => resolve("approved")}
+              className="px-4 py-2 rounded-lg bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition"
+            >
+              ✅ Approve
+            </button>
+            <button
+              onClick={() => resolve("rejected")}
+              className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition"
+            >
+              ❌ Reject
+            </button>
+          </div>
+        </div>
+      );
     },
   });
 

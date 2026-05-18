@@ -5,7 +5,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain.agents import create_agent
 from copilotkit import CopilotKitMiddleware, CopilotKitState
-from copilotkit.langchain import copilotkit_emit_state   # intermediate state streaming
+from copilotkit.langchain import copilotkit_emit_state, copilotkit_emit_message   # state + message streaming
 from langgraph.checkpoint.memory import MemorySaver
 
 # ── Thread Persistence ──────────────────────────────────────────────────
@@ -34,6 +34,13 @@ from tools.analytics_tools import (
     get_hr_summary as _get_hr_summary,
     get_healthcare_summary as _get_healthcare_summary,
     get_wireless_summary as _get_wireless_summary,
+)
+from tools.rag_tool import search_documents
+from tools.weather_tools import (
+    get_current_weather,
+    get_weather_forecast,
+    get_hourly_temperature,
+    compare_cities_weather,
 )
 
 PROMPT_PATH = os.path.join(os.path.dirname(__file__), "prompt_instructions.txt")
@@ -195,6 +202,24 @@ async def emit_progress(status: str, active_domain: str = "") -> str:
     return f"Progress emitted: {status}"
 
 
+# ── copilotkit_emit_message — Custom AG-UI Event tool ────────────────────
+# Sends a custom message event from the graph to the frontend.
+# The frontend can listen via useCoAgentStateRender or useCopilotAction render.
+# This demonstrates the AG-UI Custom Events pattern.
+@tool
+async def emit_notification(message: str, level: str = "info") -> str:
+    """Emit a custom notification message to the frontend.
+    Use this to send toast notifications, alerts or progress updates.
+    message: the notification text to display.
+    level: one of 'info', 'success', 'warning', 'error'.
+    """
+    try:
+        await copilotkit_emit_message(message)
+    except Exception:
+        pass  # best-effort; never abort the run
+    return f"Notification emitted: [{level}] {message}"
+
+
 def build_agent():
     """Build a LangGraph agent using CopilotKit's official middleware.
 
@@ -222,17 +247,16 @@ def build_agent():
         hr_summary,
         healthcare_summary,
         wireless_summary,
-        emit_progress,   # copilotkit_emit_state — broadcasts intermediate state to frontend
+        search_documents,    # RAG — semantic search over domain knowledge docs
+        emit_progress,       # copilotkit_emit_state — broadcasts intermediate state to frontend
+        emit_notification,   # copilotkit_emit_message — custom AG-UI event notifications
     ]
 
     # ── Checkpointer: persist threads in SQLite, fallback to in-memory ──
-    if _USE_SQLITE_CHECKPOINTER:
-        import aiosqlite, pathlib
-        db_path = pathlib.Path(__file__).parent.parent / "data" / "checkpoints.db"
-        db_path.parent.mkdir(exist_ok=True)
-        checkpointer = AsyncSqliteSaver(aiosqlite.connect(str(db_path)))
-    else:
-        checkpointer = MemorySaver()
+    # AsyncSqliteSaver requires a running event loop at construction time,
+    # so we always use MemorySaver here (safe for dev). The graph is built
+    # once at import time before uvicorn starts the event loop.
+    checkpointer = MemorySaver()
 
     return create_agent(
         model=llm,
@@ -244,4 +268,110 @@ def build_agent():
         state_schema=CopilotKitState,
         system_prompt=get_system_prompt(),
         checkpointer=checkpointer,
+    )
+
+
+# ── Domain-specific agents for Multi-Agent Routing demo ──────────────────
+# Each specialist has a focused tool set and tailored system prompt.
+# Registered separately in main.py under unique names.
+
+def _build_domain_agent(domain: str, summary_tool, extra_prompt: str):
+    """Factory: create a lean single-domain specialist agent."""
+    model_name = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name, temperature=0)
+
+    tools = [
+        list_tables, table_schema, summarize_table,
+        group_by_count, group_by_sum, group_by_avg,
+        time_series, top_n, run_sql,
+        summary_tool,
+        search_documents,
+        emit_progress,
+    ]
+
+    prompt = (
+        f"You are a specialist AI for the {domain} domain. "
+        f"{extra_prompt} "
+        "Always fetch real data before answering. "
+        "For visualizations use group_by_count or group_by_sum, never invent numbers."
+    )
+
+    return create_agent(
+        model=llm,
+        tools=tools,
+        middleware=[CopilotKitMiddleware(expose_state=True)],
+        state_schema=CopilotKitState,
+        system_prompt=prompt,
+        checkpointer=MemorySaver(),
+    )
+
+
+def build_finance_agent():
+    return _build_domain_agent(
+        "Finance",
+        finance_summary,
+        "You have deep expertise in financial KPIs, budgets, P&L, and cash flow. "
+        "Tables: finance_accounts, finance_transactions.",
+    )
+
+
+def build_hr_agent():
+    return _build_domain_agent(
+        "HR",
+        hr_summary,
+        "You have deep expertise in HR: headcount, payroll, attrition, and policy. "
+        "Tables: hr_employees, hr_payroll.",
+    )
+
+
+def build_healthcare_agent():
+    return _build_domain_agent(
+        "Healthcare",
+        healthcare_summary,
+        "You have deep expertise in healthcare operations, patient care metrics, "
+        "and HIPAA compliance. Tables: healthcare_patients, healthcare_appointments.",
+    )
+
+
+def build_wireless_agent():
+    return _build_domain_agent(
+        "Wireless",
+        wireless_summary,
+        "You have deep expertise in wireless/telecom: subscriber metrics, "
+        "data usage, churn, and plan analytics. Tables: wireless_customers, wireless_usage.",
+    )
+
+
+def build_weather_agent():
+    """Weather agent — uses Open-Meteo MCP-style tools (no API key needed)."""
+    model_name = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    llm = ChatOpenAI(model=model_name, temperature=0)
+
+    tools = [
+        get_current_weather,
+        get_weather_forecast,
+        get_hourly_temperature,
+        compare_cities_weather,
+        emit_progress,
+    ]
+
+    prompt = (
+        "You are a helpful weather assistant powered by Open-Meteo real-time data. "
+        "ALWAYS call the appropriate tool before answering — never invent weather data. "
+        "Tool usage rules:\n"
+        "- get_current_weather: use for 'current', 'now', 'today's weather' queries.\n"
+        "- get_weather_forecast: use when user asks for forecast, 'next N days', 'this week'.\n"
+        "- get_hourly_temperature: use for 'hourly', 'throughout the day', 'temperature chart today'.\n"
+        "- compare_cities_weather: use when user asks to compare two cities.\n"
+        "Present temperatures in both °C and °F (°F = °C × 9/5 + 32). "
+        "Be concise and friendly. Suggest follow-up actions like viewing the forecast or hourly chart."
+    )
+
+    return create_agent(
+        model=llm,
+        tools=tools,
+        middleware=[CopilotKitMiddleware(expose_state=True)],
+        state_schema=CopilotKitState,
+        system_prompt=prompt,
+        checkpointer=MemorySaver(),
     )

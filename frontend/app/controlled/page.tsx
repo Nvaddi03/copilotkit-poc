@@ -1,7 +1,7 @@
 "use client";
 
 import { CopilotPopup } from "@copilotkit/react-ui";
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCopilotAction, useRenderToolCall } from "@copilotkit/react-core";
 import { FlightCard, type Flight } from "../../components/FlightCard";
 import { GenPieChart, type PieDatum } from "../../components/PieChart";
 import { useState } from "react";
@@ -57,11 +57,36 @@ export default function ControlledPage() {
     },
   });
 
+  // ── useRenderToolCall ─────────────────────────────────────────────────
+  // Registers a custom inline React renderer for the "showFlightOptions"
+  // tool call. This is shown inside the chat bubble while (and after) the
+  // tool executes — separate from the handler above that updates page state.
+  useRenderToolCall({
+    name: "showFlightOptions",
+    parameters: [],
+    render: ({ status, args }) => {
+      const flightArgs = (args as any)?.flights as Flight[] | undefined;
+      if (!flightArgs?.length) return null;
+      return (
+        <div className="mt-2 space-y-1">
+          <p className="text-xs font-semibold text-slate-500">
+            {status === "executing" ? "⏳ Loading flights…" : `✈️ ${flightArgs.length} flights found`}
+          </p>
+          {flightArgs.map((f, i) => (
+            <div key={i} className="rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-2 text-xs text-indigo-800">
+              <strong>{f.airline} {f.flightNumber}</strong>{" "}
+              {f.from} → {f.to} · {f.depart} – {f.arrive} · <strong>${f.price}</strong>
+            </div>
+          ))}
+        </div>
+      );
+    },
+  });
+
   // ── useFrontendTool ──────────────────────────────────────────────────
   // This action runs 100% in the browser — it never calls the backend.
   // The agent can call it to copy any text to the user's clipboard.
-  useCopilotAction({
-    name: "copyToClipboard",
+  useCopilotAction({    name: "copyToClipboard",
     description:
       "Copy a text summary to the user's clipboard. Use when the user asks to copy a result, flight detail, or any text. This is a FRONTEND-ONLY tool — never calls the backend.",
     parameters: [

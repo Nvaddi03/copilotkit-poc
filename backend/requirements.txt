@@ -10,3 +10,6 @@ langchain-openai
 python-dotenv
 faker
 sqlalchemy
+langchain-text-splitters
+langchain-community
+faiss-cpu

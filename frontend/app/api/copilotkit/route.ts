@@ -10,14 +10,27 @@ import { LangGraphHttpAgent } from "@copilotkit/runtime/langgraph";
 //   <base>/agents/<name>  using the AG-UI HTTP protocol.
 const REMOTE_BASE =
   process.env.COPILOTKIT_REMOTE_URL || "http://localhost:8000/api/copilotkit";
-const AGENT_NAME = "copilotkit-agent";
+
+// Register all available agents from the backend
+const AGENT_NAMES = [
+  "copilotkit-agent",
+  "finance-agent",
+  "hr-agent",
+  "healthcare-agent",
+  "wireless-agent",
+  "weather-agent",
+];
+
+// Build agents object dynamically
+const agents: Record<string, any> = {};
+for (const agentName of AGENT_NAMES) {
+  agents[agentName] = new (LangGraphHttpAgent as any)({
+    url: `${REMOTE_BASE}/agents/${agentName}`,
+  });
+}
 
 const runtime = new CopilotRuntime({
-  agents: {
-    [AGENT_NAME]: new (LangGraphHttpAgent as any)({
-      url: `${REMOTE_BASE}/agents/${AGENT_NAME}`,
-    }),
-  } as any,
+  agents: agents as any,
 });
 
 // The backend agent provides the LLM, so we use an empty adapter here.

@@ -2,8 +2,7 @@ import "./globals.css";
 import "@copilotkit/react-ui/styles.css";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CopilotKit } from "@copilotkit/react-core";
-import { COPILOT_RUNTIME_URL, COPILOT_AGENT_NAME } from "../lib/copilot-config";
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
 export const metadata: Metadata = {
   title: "CopilotKit POC – Multi-Domain Assistant",
@@ -12,11 +11,17 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/",           label: "Dashboard" },
-  { href: "/controlled", label: "L3 · Controlled GenUI" },
+  { href: "/",            label: "Dashboard" },
+  { href: "/controlled",  label: "L3 · Controlled GenUI" },
   { href: "/declarative", label: "L4 · Declarative GenUI" },
-  { href: "/open",       label: "L5 · Open GenUI" },
-  { href: "/hitl",       label: "HITL · Approvals" },
+  { href: "/open",        label: "L5 · Open GenUI" },
+  { href: "/hitl",        label: "HITL · Approvals" },
+  { href: "/chat",        label: "Custom Chat" },
+  { href: "/multiagent",  label: "Multi-Agent" },
+  { href: "/rag",         label: "RAG Search" },
+  { href: "/multimodal",  label: "Vision" },
+  { href: "/voice",       label: "Voice" },
+  { href: "/external-api", label: "🌤️ Weather External API" },
 ];
 
 export default function RootLayout({
@@ -27,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen antialiased">
-        <CopilotKit runtimeUrl={COPILOT_RUNTIME_URL} agent={COPILOT_AGENT_NAME}>
+        <ClientLayoutWrapper>
           <header className="border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-20">
             <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
@@ -50,7 +55,7 @@ export default function RootLayout({
             </div>
           </header>
           <main className="max-w-7xl mx-auto px-6 py-8">{children}</main>
-        </CopilotKit>
+        </ClientLayoutWrapper>
       </body>
     </html>
   );

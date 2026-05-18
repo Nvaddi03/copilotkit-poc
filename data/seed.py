@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS healthcare_appointments (
 # Wireless/Telecom domain: customers, plans, usage
 c.execute("""
 CREATE TABLE IF NOT EXISTS wireless_customers (
-    id INTEGER PRIMARY KEY, name TEXT, phone TEXT, signup_date DATE
+    id INTEGER PRIMARY KEY, name TEXT, phone TEXT, plan TEXT, signup_date DATE
 )
 """)
 c.execute("""
@@ -94,9 +94,10 @@ for pat_id in range(1, NUM_ROWS+1):
                   (pat_id, fake.name(), fake.date_this_year(), fake.sentence(nb_words=6)))
 
 # Populate Wireless/Telecom
+plans = ["Basic 5GB", "Standard 10GB", "Premium 20GB", "Unlimited"]
 for _ in range(NUM_ROWS):
-    c.execute("INSERT INTO wireless_customers (name, phone, signup_date) VALUES (?, ?, ?)",
-              (fake.name(), fake.phone_number(), fake.date_this_decade()))
+    c.execute("INSERT INTO wireless_customers (name, phone, plan, signup_date) VALUES (?, ?, ?, ?)",
+              (fake.name(), fake.phone_number(), random.choice(plans), fake.date_this_decade()))
 for cust_id in range(1, NUM_ROWS+1):
     for _ in range(random.randint(2, 5)):
         c.execute("INSERT INTO wireless_usage (customer_id, data_used, minutes_used, usage_date) VALUES (?, ?, ?, ?)",

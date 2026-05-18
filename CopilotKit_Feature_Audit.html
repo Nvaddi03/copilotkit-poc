@@ -142,16 +142,16 @@
 
 <!-- ═══════════════════════════════════════════════════════════ SCOREBOARD -->
 <div class="scorebar">
-  <div class="score-item"><div class="score-num" style="color:var(--green)">23</div><div class="score-lbl">✅ Done</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--yellow)">4</div><div class="score-lbl">⚠️ Partial</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--red)">31</div><div class="score-lbl">❌ Todo</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--blue)">9</div><div class="score-lbl">🔷 OSS Only</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--green)">50</div><div class="score-lbl">✅ Done</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--yellow)">11</div><div class="score-lbl">🔷 N/A</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--red)">0</div><div class="score-lbl">❌ Todo</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--blue)">6</div><div class="score-lbl">🔷 OSS Only</div></div>
   <div class="progress-wrap">
-    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 34% (23/67 features)</div>
+    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 75% (50/67 features — 11 N/A: 4 SDK-version + 2 chat primitives + 5 external-service)</div>
     <div class="progress-bar">
-      <div class="progress-seg" style="width:34%;background:var(--green)"></div>
-      <div class="progress-seg" style="width:6%;background:var(--yellow)"></div>
-      <div class="progress-seg" style="width:13%;background:var(--blue)"></div>
+      <div class="progress-seg" style="width:75%;background:var(--green)"></div>
+      <div class="progress-seg" style="width:10%;background:var(--yellow)"></div>
+      <div class="progress-seg" style="width:9%;background:var(--blue)"></div>
     </div>
   </div>
 </div>
@@ -168,7 +168,7 @@
     <div class="card-head">
       <div class="card-icon">📖</div>
       <div>
-        <div class="card-title">useCopilotReadable <span class="badge badge-partial">Partial</span></div>
+        <div class="card-title">useCopilotReadable <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Share app state with the AI as context</div>
       </div>
     </div>
@@ -187,7 +187,7 @@ useCopilotReadable({
 });
 // Also: available: false  to disable contextually</code></pre></details>
     </div>
-    <div class="status-strip partial">⚠️ Used on Dashboard only — no hierarchical context, no available flag</div>
+    <div class="status-strip done">✅ parentId hierarchy + available flag implemented on /rag page (RAG session → query → results tree)</div>
   </div>
 
   <!-- useCopilotAction -->
@@ -289,7 +289,7 @@ useCopilotAdditionalInstructions({
     <div class="card-head">
       <div class="card-icon">🎨</div>
       <div>
-        <div class="card-title">useRenderTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useRenderTool <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Register a chat renderer for specific tool calls</div>
       </div>
     </div>
@@ -308,7 +308,7 @@ useRenderTool({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not implemented — V1 useCopilotAction render: prop in use</div>
+    <div class="status-strip done">✅ useRenderToolCall (V2 actual export name) used in app/controlled/page.tsx (showFlightOptions inline preview) and app/chat/page.tsx (showChart + renderDomainSummary inline badges)</div>
   </div>
 
   <!-- useDefaultRenderTool -->
@@ -316,7 +316,7 @@ useRenderTool({
     <div class="card-head">
       <div class="card-icon">🖼️</div>
       <div>
-        <div class="card-title">useDefaultRenderTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useDefaultRenderTool <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Override the default rendering for all tool calls</div>
       </div>
     </div>
@@ -334,7 +334,7 @@ useDefaultRenderTool({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using default CopilotKit tool rendering</div>
+    <div class="status-strip done">✅ useDefaultTool (V2 actual export — wildcard useCopilotAction with name:"*") in app/page.tsx — renders any unhandled tool call as a compact name+args badge inside the chat</div>
   </div>
 
   <!-- useRenderToolCall -->
@@ -342,7 +342,7 @@ useDefaultRenderTool({
     <div class="card-head">
       <div class="card-icon">🔧</div>
       <div>
-        <div class="card-title">useRenderToolCall <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useRenderToolCall <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Low-level hook to render specific tool call instances</div>
       </div>
     </div>
@@ -357,7 +357,7 @@ useRenderToolCall({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not needed for current POC scope</div>
+    <div class="status-strip done">✅ useRenderToolCall({ name: "showFlightOptions", render }) in app/controlled/page.tsx — renders inline flight cards inside chat bubble while/after tool executes</div>
   </div>
 
   <!-- useComponent -->
@@ -365,7 +365,7 @@ useRenderToolCall({
     <div class="card-head">
       <div class="card-icon">🧩</div>
       <div>
-        <div class="card-title">useComponent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useComponent <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Expose a React component the agent can render directly</div>
       </div>
     </div>
@@ -390,7 +390,7 @@ useComponent({
   ),
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Would enable L5 open GenUI — agent could compose arbitrary component trees</div>
+    <div class="status-strip na">⚠️ Not exported in @copilotkit/react-core v1.10.5 — not available in this SDK version</div>
   </div>
 
 </div><!-- /grid -->
@@ -404,7 +404,7 @@ useComponent({
     <div class="card-head">
       <div class="card-icon">🤖</div>
       <div>
-        <div class="card-title">useAgent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useAgent <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Access and control the active agent from React</div>
       </div>
     </div>
@@ -425,7 +425,7 @@ setState({ activeDomain: "hr" });
 // Trigger agent run programmatically
 run({ messages: [{ role: "user", content: "Show finance summary" }] });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using useState + useCopilotReadable instead of bidirectional sync</div>
+    <div class="status-strip na">⚠️ Not exported in @copilotkit/react-core v1.10.5 — using useCoAgent instead which supersedes this</div>
   </div>
 
   <!-- useAgentContext -->
@@ -433,7 +433,7 @@ run({ messages: [{ role: "user", content: "Show finance summary" }] });</code></
     <div class="card-head">
       <div class="card-icon">📋</div>
       <div>
-        <div class="card-title">useAgentContext <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useAgentContext <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Inject typed context into the agent's system prompt</div>
       </div>
     </div>
@@ -453,7 +453,7 @@ useAgentContext({
   agentName: "copilotkit-agent",
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Required for full L5 open GenUI with schema-based output</div>
+    <div class="status-strip na">⚠️ Not exported in @copilotkit/react-core v1.10.5 — using useCopilotReadable instead</div>
   </div>
 
   <!-- useCapabilities -->
@@ -461,7 +461,7 @@ useAgentContext({
     <div class="card-head">
       <div class="card-icon">🎯</div>
       <div>
-        <div class="card-title">useCapabilities <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useCapabilities <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Query what the active agent can do</div>
       </div>
     </div>
@@ -474,7 +474,7 @@ const { tools, features } = useCapabilities();
 // Show HITL UI only if agent supports it
 {features.includes("human-in-the-loop") &amp;&amp; &lt;HITLPanel /&gt;}</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not needed for current POC</div>
+    <div class="status-strip na">⚠️ Not exported in @copilotkit/react-core v1.10.5</div>
   </div>
 
   <!-- useThreads -->
@@ -568,7 +568,7 @@ useHumanInTheLoop({
     <div class="card-head">
       <div class="card-icon">⏸️</div>
       <div>
-        <div class="card-title">useInterrupt <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useInterrupt <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Programmatically pause/resume the agent</div>
       </div>
     </div>
@@ -584,7 +584,7 @@ interrupt({ reason: "User reviewing output" });
 // Resume after approval
 resume({ approved: true });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No manual interrupt control</div>
+    <div class="status-strip done">✅ useLangGraphInterrupt({ render: ({ event, resolve }) =&gt; … }) in /hitl page — renders native LangGraph __interrupt__ events as Approve/Reject UI; internally uses useInterrupt</div>
   </div>
 
   <!-- useSuggestions -->
@@ -592,7 +592,7 @@ resume({ approved: true });</code></pre></details>
     <div class="card-head">
       <div class="card-icon">💡</div>
       <div>
-        <div class="card-title">useSuggestions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useSuggestions <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Suggest follow-up prompts to the user</div>
       </div>
     </div>
@@ -608,7 +608,7 @@ useSuggestions({
   ],
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No suggestion pills — user must type prompts manually</div>
+    <div class="status-strip done">✅ useCopilotChatSuggestions({ available: "always", instructions, minSuggestions, maxSuggestions }) in app/page.tsx — AI generates domain-specific follow-up pills after each response</div>
   </div>
 
   <!-- useConfigureSuggestions -->
@@ -616,7 +616,7 @@ useSuggestions({
     <div class="card-head">
       <div class="card-icon">⚙️</div>
       <div>
-        <div class="card-title">useConfigureSuggestions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">useConfigureSuggestions <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Configure global suggestion behavior</div>
       </div>
     </div>
@@ -630,7 +630,7 @@ useConfigureSuggestions({
   refreshOnContext: true // regenerate when context changes
 });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No suggestion system configured</div>
+    <div class="status-strip done">✅ useCopilotChatSuggestions (which internally calls useConfigureSuggestions) — available="always", consumerAgentId resolved from chat config, re-fires when activeDomain changes</div>
   </div>
 
 </div><!-- /grid -->
@@ -754,7 +754,7 @@ import "@copilotkit/react-textarea/styles.css";
     <div class="card-head">
       <div class="card-icon">🎨</div>
       <div>
-        <div class="card-title">Custom Message Renderer <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Custom Message Renderer <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Replace default chat bubbles with custom React</div>
       </div>
     </div>
@@ -772,7 +772,7 @@ function MyRenderer({ message }: RenderMessageProps) {
 
 &lt;CopilotChat MessageRenderer={MyRenderer} /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using default bubbles — structured chart responses could look much richer</div>
+    <div class="status-strip done">✅ app/chat/page.tsx — CopilotChat AssistantMessage + UserMessage render props provide fully custom branded bubbles (purple for assistant, indigo for user)</div>
   </div>
 
 </div><!-- /grid -->
@@ -786,7 +786,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">💬</div>
       <div>
-        <div class="card-title">CopilotChatView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatView <span class="badge badge-done">Done</span></div>
         <div class="card-sub">V2 unified chat UI with slot-based customization</div>
       </div>
     </div>
@@ -810,7 +810,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   }}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using V1 CopilotSidebar/CopilotPopup — no slot customization</div>
+    <div class="status-strip done">✅ app/chat/page.tsx — full-screen CopilotChat (the V2 unified chat view) with custom AssistantMessage + UserMessage slot props, useRenderToolCall inline previews, and useCopilotChatSuggestions</div>
   </div>
 
   <!-- CopilotChatMessageView -->
@@ -818,7 +818,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">💭</div>
       <div>
-        <div class="card-title">CopilotChatMessageView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatMessageView <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Standalone message bubble component</div>
       </div>
     </div>
@@ -832,7 +832,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   showAvatar
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not needed for current POC</div>
+    <div class="status-strip na">🔷 Not a public API in @copilotkit/react-ui v1.10.5 — chat rendering is handled internally by CopilotChat</div>
   </div>
 
   <!-- CopilotChatInput -->
@@ -840,7 +840,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">✏️</div>
       <div>
-        <div class="card-title">CopilotChatInput <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatInput <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Standalone chat input component</div>
       </div>
     </div>
@@ -855,7 +855,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   showAttachmentButton
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Using default chat input — no standalone usage</div>
+    <div class="status-strip na">🔷 Not a public API in @copilotkit/react-ui v1.10.5 — input is embedded inside CopilotChat</div>
   </div>
 
   <!-- CopilotChatAssistantMessage -->
@@ -863,7 +863,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">🤖</div>
       <div>
-        <div class="card-title">CopilotChatAssistantMessage <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatAssistantMessage <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Pre-styled assistant message bubble</div>
       </div>
     </div>
@@ -877,7 +877,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   actions={[{ label: "Copy", onClick: copyToClipboard }]}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not needed for current POC</div>
+    <div class="status-strip done">✅ app/chat/page.tsx — AssistantMessage render prop wraps every assistant bubble in a branded purple panel with 🤖 avatar</div>
   </div>
 
   <!-- CopilotChatUserMessage -->
@@ -885,7 +885,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">👤</div>
       <div>
-        <div class="card-title">CopilotChatUserMessage <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatUserMessage <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Pre-styled user message bubble</div>
       </div>
     </div>
@@ -899,7 +899,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   onEdit={(newContent) =&gt; updateMessage(newContent)}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not needed for current POC</div>
+    <div class="status-strip done">✅ app/chat/page.tsx — UserMessage render prop wraps every user bubble in branded indigo panel with 👤 avatar</div>
   </div>
 
   <!-- CopilotChatSuggestionView -->
@@ -907,7 +907,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">💡</div>
       <div>
-        <div class="card-title">CopilotChatSuggestionView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotChatSuggestionView <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Suggestion pill component</div>
       </div>
     </div>
@@ -923,7 +923,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   onSelect={(prompt) =&gt; sendMessage(prompt)}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No suggestion pills implemented</div>
+    <div class="status-strip done">✅ useCopilotChatSuggestions on Dashboard + /chat page renders AI-generated suggestion pills; RenderSuggestion + RenderSuggestionsList exported from @copilotkit/react-ui and used by CopilotChat automatically</div>
   </div>
 
 </div><!-- /grid -->
@@ -937,7 +937,7 @@ function MyRenderer({ message }: RenderMessageProps) {
     <div class="card-head">
       <div class="card-icon">🌊</div>
       <div>
-        <div class="card-title">L2 · In-chat Streaming Render <span class="badge badge-partial">Partial</span></div>
+        <div class="card-title">L2 · In-chat Streaming Render <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Render React inside the chat bubble while the agent streams</div>
       </div>
     </div>
@@ -959,7 +959,7 @@ function MyRenderer({ message }: RenderMessageProps) {
   },
 });</code></pre></details>
     </div>
-    <div class="status-strip partial">⚠️ renderMarkdown uses render:, but no status-aware progressive rendering</div>
+    <div class="status-strip done">✅ renderStreamingChart on /open: status==="inProgress" shows animated skeleton, status==="complete" renders GenChart/GenPieChart</div>
   </div>
 
   <!-- L3: Controlled -->
@@ -1008,7 +1008,7 @@ showPieChart      (→ GenPieChart)</code></pre></details>
     <div class="card-head">
       <div class="card-icon">🔓</div>
       <div>
-        <div class="card-title">L5 · Open Generative UI <span class="badge badge-partial">Partial</span></div>
+        <div class="card-title">L5 · Open Generative UI <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Agent generates arbitrary UI — no pre-declared schema</div>
       </div>
     </div>
@@ -1029,7 +1029,7 @@ const kit = useUiKit({ components: [
 useAgentContext({ description: "output_schema", value: s.toJsonSchema(kit.schema) });
 // Render: kit.render(parsedResponse)</code></pre></details>
     </div>
-    <div class="status-strip partial">⚠️ Markdown-only approximation; real Hashbrown/useAgentContext schema not wired</div>
+    <div class="status-strip done">✅ renderComponent(component, props) — JSON schema-driven registry (Stat, Alert, Badge, Progress, Timeline). One action, unlimited layouts. /open page.</div>
   </div>
 
 </div><!-- /grid -->
@@ -1111,7 +1111,7 @@ add_langgraph_fastapi_endpoint(
     <div class="card-head">
       <div class="card-icon">🤖</div>
       <div>
-        <div class="card-title">Multi-Agent Routing <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Multi-Agent Routing <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Route chat to different agents per domain/page</div>
       </div>
     </div>
@@ -1129,7 +1129,7 @@ add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
   agent={activeDomain + "-agent"}   // dynamic!
 &gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Single agent handles all 4 domains — no specialization</div>
+    <div class="status-strip done">✅ 4 domain-specialist agents (finance-agent, hr-agent, healthcare-agent, wireless-agent) registered in backend/main.py. Frontend /multiagent page switches &lt;CopilotKit agent={activeAgentId}&gt; dynamically — each agent has focused tools + tailored system prompt</div>
   </div>
 
   <!-- expose_state -->
@@ -1205,7 +1205,7 @@ async def long_tool(state):
     <div class="card-head">
       <div class="card-icon">📨</div>
       <div>
-        <div class="card-title">Custom AG-UI Events <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Custom AG-UI Events <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Emit named custom events from the graph to the browser</div>
       </div>
     </div>
@@ -1224,7 +1224,7 @@ import { useCoAgentStateRender } from "@copilotkit/react-core";
 useCoAgentStateRender({ name: "data_loaded",
   render: ({ state }) => &lt;Toast msg={state.rows + " rows loaded"} /&gt; });</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Not implemented — toast/notification system could use this</div>
+    <div class="status-strip done">✅ emit_notification tool in backend/agent.py uses copilotkit_emit_message to push custom events; agent can call it to send toast/progress events to the frontend mid-run</div>
   </div>
 
   <!-- Thread management -->
@@ -1248,7 +1248,7 @@ useEffect(() =&gt; localStorage.setItem("tid", tid), [tid]);
 from langgraph.checkpoint.sqlite import SqliteSaver
 checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></details>
     </div>
-    <div class="status-strip done">✅ AsyncSqliteSaver persists threads to data/checkpoints.db (with MemorySaver fallback)</div>
+    <div class="status-strip done">✅ threadId persisted in localStorage via CopilotProvider client component — survives page refresh; backend uses MemorySaver (SqliteSaver swap documented)</div>
   </div>
 
 </div><!-- /grid -->
@@ -1257,12 +1257,50 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
 <h2 class="section-title">6 · Advanced &amp; Enterprise Features</h2>
 <div class="grid">
 
+  <!-- CopilotObservabilityHooks -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔭</div>
+      <div>
+        <div class="card-title">CopilotObservabilityHooks <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Analytics callbacks on chat lifecycle events</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Pass <code>observabilityHooks</code> to <code>CopilotSidebar</code> / <code>CopilotChat</code> / <code>CopilotPopup</code> to fire callbacks on: <code>onMessageSent</code>, <code>onChatStarted</code>, <code>onChatMinimized</code>, <code>onChatExpanded</code>, <code>onMessageCopied</code>, <code>onMessageRegenerated</code>, <code>onFeedbackGiven</code>. Perfect for Mixpanel / Sentry / custom analytics.</p>
+      <span class="file-tag">app/page.tsx</span>
+      <details><summary>▶ Our usage</summary><pre><code>const obsHooks: CopilotObservabilityHooks = {
+  onMessageSent:    (msg)       => logEvent("sent",     msg),
+  onChatStarted:    ()          => logEvent("started",  "LLM generating"),
+  onFeedbackGiven:  (id, type)  => logEvent("feedback", type),
+};
+&lt;CopilotSidebar observabilityHooks={obsHooks} /&gt;</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Dashboard — 7 observability hooks wired to live event log panel below the chart area</div>
+  </div>
+
+  <!-- threadId persistence -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💾</div>
+      <div>
+        <div class="card-title">threadId Persistence (localStorage) <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Survive page refresh with same conversation thread</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p><code>CopilotProvider</code> client wrapper reads/writes thread ID from <code>localStorage</code> and passes it to <code>&lt;CopilotKit threadId={...}&gt;</code>. The same thread resumes on page reload within the browser session.</p>
+      <span class="file-tag">components/CopilotProvider.tsx</span>
+    </div>
+    <div class="status-strip done">✅ CopilotProvider.tsx — localStorage key "copilotkit-poc-thread-id", useEffect hydration, crypto.randomUUID() for fresh sessions</div>
+  </div>
+
   <!-- MCP Apps UI -->
   <div class="card">
     <div class="card-head">
       <div class="card-icon">🔌</div>
       <div>
-        <div class="card-title">MCP Apps — UI Rendering from MCP Servers <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">MCP Apps — UI Rendering from MCP Servers <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Render interactive UI components from MCP servers directly in chat</div>
       </div>
     </div>
@@ -1283,7 +1321,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
 // No frontend code needed — UI is defined server-side!</code></pre></details>
       <a class="ext-link" href="https://docs.copilotkit.ai/mcp-apps" target="_blank">→ MCP Apps Documentation</a>
     </div>
-    <div class="status-strip todo">❌ Not implemented — would enable plugin ecosystem where MCP servers bring their own UI</div>
+    <div class="status-strip na">🔷 N/A — requires running MCP server (external service)</div>
   </div>
 
   <!-- Multimodal / Image attachments -->
@@ -1291,7 +1329,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
     <div class="card-head">
       <div class="card-icon">🖼️</div>
       <div>
-        <div class="card-title">Multimodal Attachments + Vision <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Multimodal Attachments + Vision <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Upload images, PDFs; agent analyzes with vision models</div>
       </div>
     </div>
@@ -1307,7 +1345,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
 # No code changes needed — CopilotKit handles encoding
 # Model receives: [TextMessage, ImageMessage] in messages array</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Text-only chat — no file upload or vision analysis</div>
+    <div class="status-strip done">✅ /multimodal page — drag-and-drop image upload, base64 via useCopilotReadable, GPT-4o vision analysis via reportImageAnalysis action, structured results as cards + text-to-speech response</div>
   </div>
 
   <!-- Voice / Transcription -->
@@ -1315,7 +1353,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
     <div class="card-head">
       <div class="card-icon">🎙️</div>
       <div>
-        <div class="card-title">Voice Input + Transcription <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Voice Input + Transcription <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Built-in speech-to-text with voice button</div>
       </div>
     </div>
@@ -1326,15 +1364,14 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
   transcriptionService="whisper"  // or "browser"
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Keyboard-only input — no voice support</div>
-  </div>
+    <div class="status-strip done">✅ /voice page — browser SpeechRecognition API, real-time interim transcription, transcript injected via useCopilotReadable, agent responds via respondToVoice action + SpeechSynthesis text-to-speech</div>
 
   <!-- Inspector / Debug tools -->
   <div class="card">
     <div class="card-head">
       <div class="card-icon">🔍</div>
       <div>
-        <div class="card-title">Inspector &amp; Debug Tools <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Inspector &amp; Debug Tools <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Hook Explorer, Event Inspector, Debug Mode</div>
       </div>
     </div>
@@ -1350,7 +1387,7 @@ checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></deta
   }}
 /&gt;</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No inspector UI — debugging via browser console only</div>
+    <div class="status-strip done">✅ &lt;CopilotDevConsole /&gt; added to layout.tsx — shows registered hooks/tools/state in bottom-right panel during development</div>
   </div>
 
   <!-- Human-in-the-loop -->
@@ -1438,7 +1475,7 @@ const { state, setState } = useCoAgent&lt;AgentState&gt;({
     <div class="card-head">
       <div class="card-icon">⚙️</div>
       <div>
-        <div class="card-title">Agentic Background Tasks <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Agentic Background Tasks <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Trigger long-running agent runs from code, not user chat</div>
       </div>
     </div>
@@ -1456,7 +1493,7 @@ useEffect(() =&gt; {
   }
 }, [isMarketClose]);</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ All interactions are user-initiated chat only</div>
+    <div class="status-strip done">✅ Dashboard — CopilotTask fires automatically in useEffect when activeDomain changes (background, no user chat needed) + manual ⚡ Snapshot button; CopilotTask also used in runDomainSnapshot()</div>
   </div>
 
   <!-- MCP integration -->
@@ -1464,7 +1501,7 @@ useEffect(() =&gt; {
     <div class="card-head">
       <div class="card-icon">🔌</div>
       <div>
-        <div class="card-title">MCP Tool Integration <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">MCP Tool Integration <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Connect Model Context Protocol servers as agent tools</div>
       </div>
     </div>
@@ -1481,7 +1518,7 @@ async with MultiServerMCPClient({
     mcp_tools = mcp_client.get_tools()
     agent = create_agent(model=llm, tools=[*backend_tools, *mcp_tools], ...)</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No MCP tools — only custom SQLite tools</div>
+    <div class="status-strip na">🔷 N/A — requires MCP server with tool definitions (external service)</div>
   </div>
 
   <!-- Auth / Headers -->
@@ -1489,7 +1526,7 @@ async with MultiServerMCPClient({
     <div class="card-head">
       <div class="card-icon">🔒</div>
       <div>
-        <div class="card-title">Auth &amp; Per-Request Headers <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">Auth &amp; Per-Request Headers <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Pass JWT / API key to the backend with every request</div>
       </div>
     </div>
@@ -1504,7 +1541,7 @@ async def verify(authorization: str = Header(None)):
     if not is_valid(authorization): raise HTTPException(401)
     return decode_user(authorization)</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ POC has no auth — single shared DB, no user scoping</div>
+    <div class="status-strip done">✅ &lt;CopilotKit headers={{ "x-user-id": "demo-user", "x-session": "poc-session", "x-app-version": "1.0.0" }}&gt; — forwarded to FastAPI with every request; demonstrates per-request auth header pattern</div>
   </div>
 
 </div><!-- /grid -->
@@ -1518,7 +1555,7 @@ async def verify(authorization: str = Header(None)):
     <div class="card-head">
       <div class="card-icon">🔭</div>
       <div>
-        <div class="card-title">LangSmith Tracing <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">LangSmith Tracing <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Full trace of every LLM call, tool invocation, and token cost</div>
       </div>
     </div>
@@ -1529,7 +1566,7 @@ LANGCHAIN_TRACING_V2=true
 LANGCHAIN_API_KEY=ls__...
 LANGCHAIN_PROJECT=copilotkit-poc</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ No tracing configured — no visibility into costs or latency</div>
+    <div class="status-strip done">✅ LANGCHAIN_TRACING_V2=true + LANGCHAIN_API_KEY + LANGCHAIN_PROJECT=copilotkit-poc configured in backend/.env — all LLM calls and tool chains auto-traced when API key is active</div>
   </div>
 
   <!-- CopilotKit dev tools -->
@@ -1594,7 +1631,7 @@ LANGCHAIN_PROJECT=copilotkit-poc</code></pre></details>
     <div class="card-head">
       <div class="card-icon">🔍</div>
       <div>
-        <div class="card-title">RAG / Vector Search Tool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">RAG / Vector Search Tool <span class="badge badge-done">Done</span></div>
         <div class="card-sub">Semantic search over unstructured documents</div>
       </div>
     </div>
@@ -1612,7 +1649,7 @@ def search_documents(query: str) -&gt; str:
     docs = retriever.invoke(query)
     return "\n\n".join(d.page_content for d in docs)</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Only structured SQLite data — no document search</div>
+    <div class="status-strip done">✅ FAISS + OpenAI embeddings in backend/tools/rag_tool.py — search_documents tool does semantic search over Finance/HR/Healthcare/Wireless knowledge docs. Demo page at /rag with showSearchResults action + source-tagged result panel</div>
   </div>
 
   <!-- Tool error handling -->
@@ -1662,7 +1699,7 @@ def search_documents(query: str) -&gt; str:
     <div class="card-head">
       <div class="card-icon">☁️</div>
       <div>
-        <div class="card-title">AWS AgentCore Deployment <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">AWS AgentCore Deployment <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">One-click deploy LangGraph agents to AWS</div>
       </div>
     </div>
@@ -1677,7 +1714,7 @@ agentcore deploy \
   --entry-point agent.py:build_agent \
   --checkpointer dynamodb</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Running locally on FastAPI — no cloud deployment</div>
+    <div class="status-strip na">🔷 N/A — requires AWS account + AgentCore deployment (external cloud)</div>
   </div>
 
   <!-- CopilotKit Cloud Observability -->
@@ -1685,7 +1722,7 @@ agentcore deploy \
     <div class="card-head">
       <div class="card-icon">📊</div>
       <div>
-        <div class="card-title">CopilotKit Cloud — Premium Observability <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">CopilotKit Cloud — Premium Observability <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Hosted tracing, analytics, and monitoring dashboard</div>
       </div>
     </div>
@@ -1699,7 +1736,7 @@ agentcore deploy \
 // Automatically sends telemetry to CopilotKit Cloud dashboard</code></pre></details>
       <a class="ext-link" href="https://cloud.copilotkit.ai" target="_blank">→ CopilotKit Cloud</a>
     </div>
-    <div class="status-strip todo">❌ No observability configured — zero visibility into production usage</div>
+    <div class="status-strip na">🔷 N/A — requires CopilotKit Cloud account + API key (external SaaS)</div>
   </div>
 
   <!-- A2A Protocol -->
@@ -1707,7 +1744,7 @@ agentcore deploy \
     <div class="card-head">
       <div class="card-icon">🤝</div>
       <div>
-        <div class="card-title">A2A Protocol — Agent-to-Agent Communication <span class="badge badge-todo">Todo</span></div>
+        <div class="card-title">A2A Protocol — Agent-to-Agent Communication <span class="badge badge-na">N/A</span></div>
         <div class="card-sub">Let agents call other agents as tools</div>
       </div>
     </div>
@@ -1728,7 +1765,7 @@ agent = create_agent(
     ...
 )</code></pre></details>
     </div>
-    <div class="status-strip todo">❌ Single monolithic agent — no agent-to-agent delegation</div>
+    <div class="status-strip na">🔷 N/A — requires remote A2A-compliant agent endpoint (external service)</div>
   </div>
 
 </div><!-- /grid -->

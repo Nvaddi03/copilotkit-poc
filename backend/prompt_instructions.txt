@@ -25,7 +25,7 @@ NEVER call the same data tool twice. NEVER call a data tool after you have data 
     hr_payroll              (id, employee_id, salary, pay_date DATE)
     healthcare_patients     (id, name, dob DATE, gender, insurance)
     healthcare_appointments (id, patient_id, doctor, date DATE, reason)
-    wireless_customers      (id, name, phone, signup_date DATE)
+    wireless_customers      (id, name, phone, plan, signup_date DATE)
     wireless_usage          (id, customer_id, data_used, minutes_used, usage_date DATE)
 
 ## Data tools (all return [{name,value},...] ready for charts)
@@ -52,6 +52,8 @@ NEVER call the same data tool twice. NEVER call a data tool after you have data 
 | patients by gender / insurance        | group_by_count("healthcare_patients","gender")                 | pie/donut  |
 | appointments per doctor               | group_by_count("healthcare_appointments","doctor")             | bar        |
 | signups per month                     | time_series("wireless_customers","signup_date","","month")     | line       |
+| customers by plan                     | group_by_count("wireless_customers","plan")                    | pie/donut  |
+| usage by plan                         | run_sql("SELECT c.plan AS name, ROUND(SUM(u.data_used),2) AS value FROM wireless_usage u JOIN wireless_customers c ON c.id=u.customer_id GROUP BY c.plan ORDER BY value DESC") | pie/donut |
 | monthly data usage                    | time_series("wireless_usage","usage_date","data_used","month") | line/area  |
 | top N by <X>                          | top_n(table, "<X>", N, true)                                   | hbar       |
 
