@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+copilotkit
+ag-ui-protocol
+langchain
+langgraph
+langchain-openai
+python-dotenv
+faker
+sqlalchemy

@@ -1,0 +1,1962 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CopilotKit Feature Audit – POC Status</title>
+<style>
+  :root {
+    --green:   #16a34a; --green-bg:  #f0fdf4; --green-bd:  #bbf7d0;
+    --yellow:  #d97706; --yellow-bg: #fffbeb; --yellow-bd: #fde68a;
+    --red:     #dc2626; --red-bg:    #fef2f2; --red-bd:    #fecaca;
+    --blue:    #2563eb; --blue-bg:   #eff6ff; --blue-bd:   #bfdbfe;
+    --purple:  #7c3aed; --purple-bg: #f5f3ff; --purple-bd: #ddd6fe;
+    --slate:   #475569; --slate-bg:  #f8fafc; --slate-bd:  #e2e8f0;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: #f1f5f9; color: #1e293b; line-height: 1.6; }
+
+  /* ── Header ── */
+  .hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+          color: white; padding: 48px 40px 36px; }
+  .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .hero p  { margin-top: 8px; font-size: 1rem; opacity: .85; max-width: 700px; }
+  .hero-meta { display: flex; gap: 20px; margin-top: 24px; flex-wrap: wrap; }
+  .hero-badge { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+                padding: 6px 14px; border-radius: 999px; font-size: .8rem; font-weight: 600; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 40px;
+            background: white; border-bottom: 1px solid var(--slate-bd); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red    { background: var(--red); }
+  .dot-blue   { background: var(--blue); }
+
+  /* ── Score bar ── */
+  .scorebar { padding: 24px 40px; background: white; border-bottom: 1px solid var(--slate-bd);
+              display: flex; gap: 32px; flex-wrap: wrap; align-items: center; }
+  .score-item { text-align: center; }
+  .score-num  { font-size: 2rem; font-weight: 800; }
+  .score-lbl  { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--slate); }
+  .progress-wrap { flex: 1; min-width: 260px; }
+  .progress-bar  { height: 14px; border-radius: 8px; background: #e2e8f0; overflow: hidden; display: flex; }
+  .progress-seg  { height: 100%; transition: width .6s; }
+
+  /* ── Layout ── */
+  .wrapper { max-width: 1280px; margin: 0 auto; padding: 32px 40px; }
+  h2.section-title { font-size: 1.4rem; font-weight: 700; margin: 40px 0 16px;
+                     padding-bottom: 8px; border-bottom: 2px solid var(--slate-bd); color: #0f172a; }
+  h2.section-title .count { font-size: .9rem; font-weight: 600; color: var(--slate);
+                             margin-left: 8px; vertical-align: middle; }
+
+  /* ── Feature card ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; }
+  .card { background: white; border-radius: 14px; border: 1px solid var(--slate-bd);
+          overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.05); transition: box-shadow .2s; }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+  .card-head { padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; }
+  .card-icon  { font-size: 1.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .card-title { font-size: 1rem; font-weight: 700; color: #0f172a; }
+  .card-sub   { font-size: .78rem; color: var(--slate); margin-top: 2px; }
+
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px;
+           font-size: .7rem; font-weight: 700; text-transform: uppercase; margin-left: 8px; }
+  .badge-done   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+  .badge-partial{ background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+  .badge-todo   { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+  .badge-oss    { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+
+  .card-body { padding: 0 18px 14px; }
+  .card-body p { font-size: .85rem; color: #334155; margin-bottom: 10px; }
+
+  /* status strip */
+  .status-strip { padding: 8px 18px; font-size: .8rem; font-weight: 600;
+                  border-top: 1px solid var(--slate-bd); display: flex; align-items: center; gap: 8px; }
+  .status-strip.done    { background: var(--green-bg);  color: var(--green); }
+  .status-strip.partial { background: var(--yellow-bg); color: var(--yellow); }
+  .status-strip.todo    { background: var(--red-bg);    color: var(--red); }
+  .status-strip.oss     { background: var(--blue-bg);   color: var(--blue); }
+
+  /* code snippet */
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-size: .78rem; font-weight: 600; color: var(--blue);
+            user-select: none; outline: none; }
+  summary:hover { text-decoration: underline; }
+  pre { margin-top: 8px; background: #0f172a; color: #e2e8f0; border-radius: 8px;
+        padding: 14px; font-size: .72rem; overflow-x: auto; line-height: 1.6; }
+  code { font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace; }
+
+  /* where used */
+  .file-tag { display: inline-block; background: #1e293b; color: #94a3b8;
+              border-radius: 5px; padding: 2px 7px; font-size: .68rem;
+              font-family: monospace; margin: 2px 2px 0 0; }
+  .ext-link { font-size: .78rem; color: var(--blue); text-decoration: none; }
+  .ext-link:hover { text-decoration: underline; }
+
+  /* ── Roadmap table ── */
+  .roadmap { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .roadmap th { background: #1e293b; color: #e2e8f0; padding: 10px 14px; text-align: left; font-weight: 600; }
+  .roadmap td { padding: 10px 14px; border-bottom: 1px solid var(--slate-bd); vertical-align: top; }
+  .roadmap tr:last-child td { border: none; }
+  .roadmap tr:hover td { background: var(--slate-bg); }
+  .effort { padding: 2px 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+  .effort-low  { background: var(--green-bg);  color: var(--green); }
+  .effort-med  { background: var(--yellow-bg); color: var(--yellow); }
+  .effort-high { background: var(--red-bg);    color: var(--red); }
+  .priority { padding: 2px 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+  .p1 { background: #fef2f2; color: #dc2626; }
+  .p2 { background: #fffbeb; color: #d97706; }
+  .p3 { background: #eff6ff; color: #2563eb; }
+
+  /* ── Footer ── */
+  footer { text-align: center; padding: 32px; font-size: .8rem; color: #94a3b8;
+           border-top: 1px solid var(--slate-bd); margin-top: 40px; background: white; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <h1>🪁 CopilotKit Feature Audit — POC Status</h1>
+  <p>Complete inventory of CopilotKit + AG-UI + LangGraph features: what's supported by the framework, what we've built, and what's next.</p>
+  <div class="hero-meta">
+    <span class="hero-badge">📦 @copilotkit/react-core 0.1.89</span>
+    <span class="hero-badge">📦 ag_ui_langgraph 0.0.35</span>
+    <span class="hero-badge">🐍 langchain 1.3.1 · CopilotKitMiddleware</span>
+    <span class="hero-badge">📅 Audited May 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ LEGEND -->
+<div class="legend">
+  <span><span class="dot dot-green"></span> Implemented in this POC</span>
+  <span><span class="dot dot-yellow"></span> Partially implemented</span>
+  <span><span class="dot dot-red"></span> Not yet implemented</span>
+  <span><span class="dot dot-blue"></span> Framework-provided / OSS (no custom code needed)</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ SCOREBOARD -->
+<div class="scorebar">
+  <div class="score-item"><div class="score-num" style="color:var(--green)">11</div><div class="score-lbl">✅ Done</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--yellow)">4</div><div class="score-lbl">⚠️ Partial</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--red)">43</div><div class="score-lbl">❌ Todo</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--blue)">9</div><div class="score-lbl">🔷 OSS Only</div></div>
+  <div class="progress-wrap">
+    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 16% (11/67 features)</div>
+    <div class="progress-bar">
+      <div class="progress-seg" style="width:16%;background:var(--green)"></div>
+      <div class="progress-seg" style="width:6%;background:var(--yellow)"></div>
+      <div class="progress-seg" style="width:13%;background:var(--blue)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ WRAPPER -->
+<div class="wrapper">
+
+<!-- ──────────────────────────────────────────── SECTION 1: CORE HOOKS -->
+<h2 class="section-title">1 · Core React Hooks (V1 API) <span class="count">(Frontend)</span></h2>
+<div class="grid">
+
+  <!-- useCopilotReadable -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📖</div>
+      <div>
+        <div class="card-title">useCopilotReadable <span class="badge badge-partial">Partial</span></div>
+        <div class="card-sub">Share app state with the AI as context</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Exposes arbitrary React state as read-only context the LLM can reference. Supports <code>parentId</code> for hierarchical context trees and <code>available</code> flag to disable contextually.</p>
+      <span class="file-tag">app/page.tsx</span>
+      <details><summary>▶ Our usage</summary><pre><code>useCopilotReadable({
+  description: "Currently selected business domain and summaries",
+  value: { activeDomain, summaries },
+});</code></pre></details>
+      <details><summary>▶ Unused: parentId / hierarchy</summary><pre><code>const parentId = useCopilotReadable({ description: "User", value: user });
+useCopilotReadable({
+  description: "User prefs",
+  value: prefs,
+  parentId,          // ← not used in our POC
+});
+// Also: available: false  to disable contextually</code></pre></details>
+    </div>
+    <div class="status-strip partial">⚠️ Used on Dashboard only — no hierarchical context, no available flag</div>
+  </div>
+
+  <!-- useCopilotAction -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⚡</div>
+      <div>
+        <div class="card-title">useCopilotAction <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Register callable UI actions for the agent</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Registers a named function the backend agent can call. Supports inline <code>render</code> for live streaming preview inside the chat, async <code>handler</code> for state mutation, and <code>followUp: false</code> to suppress the follow-up LLM message.</p>
+      <span class="file-tag">app/page.tsx</span><span class="file-tag">app/controlled/page.tsx</span><span class="file-tag">app/declarative/page.tsx</span><span class="file-tag">app/open/page.tsx</span>
+      <details><summary>▶ Our actions</summary><pre><code>useCopilotAction({ name: "selectDomain", ... });
+useCopilotAction({ name: "renderDomainSummary", ... });
+useCopilotAction({ name: "showPieChart", ... });
+useCopilotAction({ name: "clearCharts", ... });
+useCopilotAction({ name: "showChart", ... });
+useCopilotAction({ name: "showFlightOptions", ... });
+useCopilotAction({ name: "renderMarkdown", render: ... });
+useCopilotAction({ name: "renderUI", ... });  // declarative</code></pre></details>
+      <details><summary>▶ Unused: streaming render + followUp</summary><pre><code>useCopilotAction({
+  name: "buildReport",
+  render: ({ args, status }) => (
+    // Streamed live while the agent is constructing args!
+    &lt;div className={status === "executing" ? "opacity-50" : ""}&gt;
+      {args.content}
+    &lt;/div&gt;
+  ),
+  followUp: false,      // ← suppress post-action LLM message
+  handler: async ({ content }) => { ... },
+});</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ 8 actions registered across 4 pages</div>
+  </div>
+
+  <!-- useCopilotChat -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💬</div>
+      <div>
+        <div class="card-title">useCopilotChat <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Programmatic chat control from outside the chat UI</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Provides <code>appendMessage</code>, <code>sendMessage</code>, <code>reloadMessages</code>, <code>stopGeneration</code>, and <code>isLoading</code>. Lets you trigger the copilot from a button, keyboard shortcut, or external event.</p>
+      <details><summary>▶ Sample: Send a prompt from a button</summary><pre><code>import { useCopilotChat } from "@copilotkit/react-core";
+import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
+
+const { appendMessage } = useCopilotChat();
+
+function OnboardingButton() {
+  return (
+    &lt;button onClick={() =&gt;
+      appendMessage(new TextMessage({
+        content: "Show me the finance summary",
+        role: MessageRole.User,
+      }))
+    }&gt;
+      Quick Finance Snapshot
+    &lt;/button&gt;
+  );
+}</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — quick-prompt buttons would use this</div>
+  </div>
+
+  <!-- useCopilotAdditionalInstructions -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📝</div>
+      <div>
+        <div class="card-title">useCopilotAdditionalInstructions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Dynamically inject page-specific system prompt segments</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Appends extra instructions to the system prompt at runtime, scoped to the component's lifetime. Useful for page-aware context without rebuilding the full prompt.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useCopilotAdditionalInstructions } from "@copilotkit/react-core";
+
+useCopilotAdditionalInstructions({
+  instructions: "The user is viewing the HR domain. Always mention department names.",
+  available: activeDomain === "hr",
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ We hard-code instructions in CopilotPopup/Sidebar props instead</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 1A: V2 TOOL RENDERING HOOKS -->
+<h2 class="section-title">1a · V2 Tool Rendering Hooks <span class="count">(CopilotKit V2 API)</span></h2>
+<div class="grid">
+
+  <!-- useRenderTool -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🎨</div>
+      <div>
+        <div class="card-title">useRenderTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Register a chat renderer for specific tool calls</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 replacement for useCopilotAction's render prop. Registers a renderer that displays when the agent calls a specific tool. Receives <code>{status: 'inProgress'|'executing'|'complete', parameters, result}</code>. Supports wildcard ('*') fallback renderer. Intentionally does NOT remove the renderer on cleanup.</p>
+      <details><summary>▶ Sample: wildcard renderer</summary><pre><code>import { useRenderTool } from "@copilotkit/react-core";
+
+useRenderTool({
+  toolName: "*",  // wildcard fallback for all tools
+  render: ({ status, parameters, result }) =&gt; (
+    &lt;div className={status === "complete" ? "opacity-100" : "opacity-50"}&gt;
+      {status === "inProgress" &amp;&amp; &lt;Skeleton /&gt;}
+      {status === "executing" &amp;&amp; &lt;Spinner /&gt;}
+      {status === "complete" &amp;&amp; &lt;pre&gt;{JSON.stringify(result, null, 2)}&lt;/pre&gt;}
+    &lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — V1 useCopilotAction render: prop in use</div>
+  </div>
+
+  <!-- useDefaultRenderTool -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🖼️</div>
+      <div>
+        <div class="card-title">useDefaultRenderTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Override the default rendering for all tool calls</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Sets a global default renderer for any tool that doesn't have a specific renderer. Useful for creating a unified "tool execution" UI card.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useDefaultRenderTool } from "@copilotkit/react-core";
+
+useDefaultRenderTool({
+  render: ({ toolName, status, parameters }) =&gt; (
+    &lt;div className="tool-card"&gt;
+      &lt;h4&gt;{toolName}&lt;/h4&gt;
+      {status === "executing" ? &lt;Spinner /&gt; : &lt;CheckIcon /&gt;}
+      &lt;pre&gt;{JSON.stringify(parameters, null, 2)}&lt;/pre&gt;
+    &lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using default CopilotKit tool rendering</div>
+  </div>
+
+  <!-- useRenderToolCall -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔧</div>
+      <div>
+        <div class="card-title">useRenderToolCall <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Low-level hook to render specific tool call instances</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Lower-level variant of useRenderTool that works with specific tool call IDs rather than tool names. Useful for rendering parallel tool calls differently.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useRenderToolCall } from "@copilotkit/react-core";
+
+useRenderToolCall({
+  toolCallId: "call_abc123",
+  render: ({ status, parameters, result }) =&gt; (
+    &lt;div&gt;Custom render for this specific call&lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not needed for current POC scope</div>
+  </div>
+
+  <!-- useComponent -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🧩</div>
+      <div>
+        <div class="card-title">useComponent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Expose a React component the agent can render directly</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 hook to register a component that the agent can invoke as if it were a tool. The component receives props from the agent and renders inline in the chat. This is the foundation for true generative UI where the agent composes components without pre-declared actions.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useComponent } from "@copilotkit/react-core";
+
+useComponent({
+  name: "StatCard",
+  description: "Display a KPI stat card",
+  parameters: z.object({
+    label: z.string(),
+    value: z.number(),
+    trend: z.enum(["up", "down", "flat"]),
+  }),
+  render: ({ label, value, trend }) =&gt; (
+    &lt;div className="stat-card"&gt;
+      &lt;span&gt;{label}&lt;/span&gt;
+      &lt;h2&gt;{value}&lt;/h2&gt;
+      &lt;span&gt;{trend === "up" ? "↑" : "↓"}&lt;/span&gt;
+    &lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Would enable L5 open GenUI — agent could compose arbitrary component trees</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 1B: V2 AGENT & STATE HOOKS -->
+<h2 class="section-title">1b · V2 Agent & State Hooks <span class="count">(CopilotKit V2 API)</span></h2>
+<div class="grid">
+
+  <!-- useAgent -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🤖</div>
+      <div>
+        <div class="card-title">useAgent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Access and control the active agent from React</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 hook that returns <code>{ state, setState, run, stop, isRunning }</code>. Provides programmatic control over the agent's execution and direct access to LangGraph state. Supersedes useCoAgent.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useAgent } from "@copilotkit/react-core";
+
+const { state, setState, run, stop, isRunning } = useAgent&lt;MyAgentState&gt;({
+  agentName: "copilotkit-agent",
+});
+
+// Read state
+console.log(state.activeDomain);
+
+// Update state (synced to backend)
+setState({ activeDomain: "hr" });
+
+// Trigger agent run programmatically
+run({ messages: [{ role: "user", content: "Show finance summary" }] });</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using useState + useCopilotReadable instead of bidirectional sync</div>
+  </div>
+
+  <!-- useAgentContext -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">useAgentContext <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Inject typed context into the agent's system prompt</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 replacement for useCopilotReadable. Supports JSON schema definitions that enable structured output parsing (for L5 open GenUI). Context can be scoped to specific agents.</p>
+      <details><summary>▶ Sample: L5 schema injection</summary><pre><code>import { useAgentContext } from "@copilotkit/react-core";
+import { s } from "@hashbrownai/core";
+
+const componentSchema = s.object({
+  type: s.enum(["Card", "Chart", "Table"]),
+  props: s.any(),
+});
+
+useAgentContext({
+  description: "output_schema",
+  value: s.toJsonSchema(componentSchema),
+  agentName: "copilotkit-agent",
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Required for full L5 open GenUI with schema-based output</div>
+  </div>
+
+  <!-- useCapabilities -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🎯</div>
+      <div>
+        <div class="card-title">useCapabilities <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Query what the active agent can do</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Returns metadata about the active agent: available tools, supported features (HITL, streaming, etc.), model capabilities. Useful for dynamic UI that adapts to agent capabilities.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useCapabilities } from "@copilotkit/react-core";
+
+const { tools, features } = useCapabilities();
+
+// Show HITL UI only if agent supports it
+{features.includes("human-in-the-loop") &amp;&amp; &lt;HITLPanel /&gt;}</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not needed for current POC</div>
+  </div>
+
+  <!-- useThreads -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🧵</div>
+      <div>
+        <div class="card-title">useThreads <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Manage multiple conversation threads</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 hook for thread management: list threads, create new threads, switch between threads, delete threads. Enables a "conversation history" sidebar.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useThreads } from "@copilotkit/react-core";
+
+const { threads, activeThreadId, createThread, switchThread, deleteThread } = useThreads();
+
+return (
+  &lt;div&gt;
+    {threads.map(t =&gt; (
+      &lt;button key={t.id} onClick={() =&gt; switchThread(t.id)}&gt;
+        {t.title || "Conversation " + t.id}
+      &lt;/button&gt;
+    ))}
+    &lt;button onClick={() =&gt; createThread()}&gt;+ New Chat&lt;/button&gt;
+  &lt;/div&gt;
+);</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Single ephemeral thread — no thread management UI</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 1C: V2 FRONTEND & HITL HOOKS -->
+<h2 class="section-title">1c · V2 Frontend Tools & HITL Hooks <span class="count">(CopilotKit V2 API)</span></h2>
+<div class="grid">
+
+  <!-- useFrontendTool -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⚡</div>
+      <div>
+        <div class="card-title">useFrontendTool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">V2 replacement for useCopilotAction</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>The new name for useCopilotAction in V2. Same functionality: register a frontend-executable function the agent can call. Supports async handler, parameters via Zod, and <code>followUp: false</code> to suppress post-action LLM message.</p>
+      <details><summary>▶ Migration from V1</summary><pre><code>// V1
+useCopilotAction({ name: "selectDomain", ... });
+
+// V2
+import { useFrontendTool } from "@copilotkit/react-core";
+useFrontendTool({ name: "selectDomain", ... });</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using V1 useCopilotAction — V2 migration pending</div>
+  </div>
+
+  <!-- useHumanInTheLoop -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🛑</div>
+      <div>
+        <div class="card-title">useHumanInTheLoop <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">React hook to handle approval/rejection UI</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 hook that detects when the backend agent emits an interrupt and surfaces an approval dialog in the chat. Works with LangGraph's <code>interrupt()</code> + <code>Command(resume=...)</code> pattern.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useHumanInTheLoop } from "@copilotkit/react-core";
+
+useHumanInTheLoop({
+  render: ({ question, options, approve, reject }) =&gt; (
+    &lt;div className="approval-card"&gt;
+      &lt;p&gt;{question}&lt;/p&gt;
+      {options.map(opt =&gt; (
+        &lt;button key={opt} onClick={() =&gt; approve(opt)}&gt;
+          {opt}
+        &lt;/button&gt;
+      ))}
+      &lt;button onClick={reject}&gt;Cancel&lt;/button&gt;
+    &lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No HITL UI — all actions fire immediately</div>
+  </div>
+
+  <!-- useInterrupt -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⏸️</div>
+      <div>
+        <div class="card-title">useInterrupt <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Programmatically pause/resume the agent</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Low-level hook to manually interrupt and resume the agent from React. Useful for custom approval workflows or debugging.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useInterrupt } from "@copilotkit/react-core";
+
+const { interrupt, resume, isInterrupted } = useInterrupt();
+
+// Pause agent
+interrupt({ reason: "User reviewing output" });
+
+// Resume after approval
+resume({ approved: true });</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No manual interrupt control</div>
+  </div>
+
+  <!-- useSuggestions -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💡</div>
+      <div>
+        <div class="card-title">useSuggestions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Suggest follow-up prompts to the user</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 hook that displays suggested follow-up questions as pill buttons above the chat input. The agent can dynamically set suggestions based on context, or you can set them from React.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useSuggestions } from "@copilotkit/react-core";
+
+useSuggestions({
+  suggestions: [
+    { text: "Show finance summary", prompt: "Show me the finance domain summary" },
+    { text: "Compare Q1 vs Q2", prompt: "Compare revenue Q1 2026 vs Q2 2026" },
+    { text: "Top 5 customers", prompt: "Show top 5 customers by revenue" },
+  ],
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No suggestion pills — user must type prompts manually</div>
+  </div>
+
+  <!-- useConfigureSuggestions -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⚙️</div>
+      <div>
+        <div class="card-title">useConfigureSuggestions <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Configure global suggestion behavior</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Global configuration hook for the suggestion system: auto-show after agent response, max suggestions, suggestion refresh strategy.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useConfigureSuggestions } from "@copilotkit/react-core";
+
+useConfigureSuggestions({
+  autoShow: true,        // show suggestions after every agent response
+  maxSuggestions: 3,     // limit to 3 pills
+  refreshOnContext: true // regenerate when context changes
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No suggestion system configured</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 2: UI COMPONENTS -->
+<h2 class="section-title">2 · Built-in UI Components (V1 API) <span class="count">(React)</span></h2>
+<div class="grid">
+
+  <!-- CopilotKit -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🏠</div>
+      <div>
+        <div class="card-title">CopilotKit Provider <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Root context provider</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Wraps the app and connects to the backend runtime. Supports <code>agent</code> routing (multi-agent), <code>runtimeUrl</code>, and per-request <code>headers</code> for auth.</p>
+      <span class="file-tag">app/layout.tsx</span>
+      <details><summary>▶ Our usage</summary><pre><code>&lt;CopilotKit
+  runtimeUrl="/api/copilotkit"
+  agent="copilotkit-agent"
+&gt;
+  {children}
+&lt;/CopilotKit&gt;</code></pre></details>
+      <details><summary>▶ Unused: auth headers</summary><pre><code>&lt;CopilotKit
+  runtimeUrl="/api/copilotkit"
+  agent="copilotkit-agent"
+  headers={{ Authorization: `Bearer ${token}` }}  // ← not set
+&gt;</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Configured with agent routing</div>
+  </div>
+
+  <!-- CopilotSidebar -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🗂️</div>
+      <div>
+        <div class="card-title">CopilotSidebar <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Collapsible right-side chat panel</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Full chat experience docked to the side. Supports <code>defaultOpen</code>, <code>instructions</code>, <code>labels</code>, custom <code>icons</code>, and <code>makeSystemMessage</code> for dynamic prompts.</p>
+      <span class="file-tag">app/page.tsx</span>
+      <details><summary>▶ Our usage</summary><pre><code>&lt;CopilotSidebar
+  defaultOpen
+  instructions="You are a multi-domain assistant..."
+  labels={{ title: "Domain Copilot", initial: "Ask me..." }}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Used on Dashboard page</div>
+  </div>
+
+  <!-- CopilotPopup -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💭</div>
+      <div>
+        <div class="card-title">CopilotPopup <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Floating chat popup button</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>A floating action button that opens a chat dialog. Ideal for feature pages that don't need a persistent sidebar. Same props as <code>CopilotSidebar</code>.</p>
+      <span class="file-tag">app/controlled/page.tsx</span><span class="file-tag">app/declarative/page.tsx</span><span class="file-tag">app/open/page.tsx</span>
+    </div>
+    <div class="status-strip done">✅ Used on L3 / L4 / L5 pages</div>
+  </div>
+
+  <!-- CopilotChat -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🗨️</div>
+      <div>
+        <div class="card-title">CopilotChat (embedded) <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Inline chat widget</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Renders the chat UI inline inside your layout (not as overlay). Used when the chat panel should be a fixed part of the page.</p>
+      <span class="file-tag">app/open/page.tsx</span>
+      <details><summary>▶ Our usage</summary><pre><code>&lt;CopilotChat
+  instructions="Call renderMarkdown for any inline UI..."
+  labels={{ title: "Open GenUI", initial: "Ask me anything!" }}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Used on L5 Open GenUI page</div>
+  </div>
+
+  <!-- CopilotTextarea -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">✏️</div>
+      <div>
+        <div class="card-title">CopilotTextarea <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">AI-powered textarea with autocomplete</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Drop-in replacement for <code>&lt;textarea&gt;</code> with AI autocomplete, suggestions triggered by typing or a shortcut. Great for report writing, notes, or any long-form input field.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotTextarea } from "@copilotkit/react-textarea";
+import "@copilotkit/react-textarea/styles.css";
+
+&lt;CopilotTextarea
+  className="w-full border rounded p-2"
+  placeholder="Write a report…"
+  autosuggestionsConfig={{
+    textareaPurpose: "Generate a financial report for Q2",
+    chatApiConfigs: {},
+  }}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — useful for report/notes pages</div>
+  </div>
+
+  <!-- Custom message renderer -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🎨</div>
+      <div>
+        <div class="card-title">Custom Message Renderer <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Replace default chat bubbles with custom React</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Pass a <code>MessageRenderer</code> component to the chat to fully control how each message type renders — e.g. parse JSON and render charts inside the bubble.</p>
+      <details><summary>▶ Sample</summary><pre><code>import type { RenderMessageProps } from "@copilotkit/react-ui";
+
+function MyRenderer({ message }: RenderMessageProps) {
+  if (message.role === "assistant" &amp;&amp; message.content?.startsWith("{")) {
+    const data = JSON.parse(message.content);
+    return &lt;MyCard data={data} /&gt;;
+  }
+  return &lt;DefaultMessageRenderer message={message} /&gt;;
+}
+
+&lt;CopilotChat MessageRenderer={MyRenderer} /&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using default bubbles — structured chart responses could look much richer</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 2A: V2 CHAT COMPONENTS -->
+<h2 class="section-title">2a · V2 Chat Components & Slots <span class="count">(CopilotKit V2 API)</span></h2>
+<div class="grid">
+
+  <!-- CopilotChatView -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💬</div>
+      <div>
+        <div class="card-title">CopilotChatView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">V2 unified chat UI with slot-based customization</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 replacement for CopilotChat/CopilotSidebar/CopilotPopup. Combines scrollable message transcript with chat input, suggestion pills, scroll-to-bottom button, and optional welcome screen. Every visual piece is exposed as a customizable slot.</p>
+      <details><summary>▶ Available slots</summary><pre><code>import { CopilotChatView } from "@copilotkit/react-ui";
+
+&lt;CopilotChatView
+  slots={{
+    messageView: CustomMessageRenderer,
+    scrollView: CustomScrollContainer,
+    scrollToBottomButton: CustomButton,
+    input: CustomTextInput,
+    inputContainer: CustomInputWrapper,
+    feather: CustomFeatherIcon,
+    disclaimer: CustomDisclaimer,
+    suggestionView: CustomSuggestionPill,
+    welcomeScreen: CustomWelcome,
+    header: CustomHeader,
+    footer: CustomFooter,
+  }}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using V1 CopilotSidebar/CopilotPopup — no slot customization</div>
+  </div>
+
+  <!-- CopilotChatMessageView -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💭</div>
+      <div>
+        <div class="card-title">CopilotChatMessageView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Standalone message bubble component</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 component for rendering individual chat messages outside the full CopilotChatView. Useful for building custom chat layouts or embedding messages in other UI.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotChatMessageView } from "@copilotkit/react-ui";
+
+&lt;CopilotChatMessageView
+  message={{ role: "assistant", content: "Here's the summary..." }}
+  showTimestamp
+  showAvatar
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not needed for current POC</div>
+  </div>
+
+  <!-- CopilotChatInput -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">✏️</div>
+      <div>
+        <div class="card-title">CopilotChatInput <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Standalone chat input component</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 component for the chat input field with built-in send button, voice input button, and attachment button. Can be used outside CopilotChatView for custom layouts.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotChatInput } from "@copilotkit/react-ui";
+
+&lt;CopilotChatInput
+  placeholder="Ask anything..."
+  onSend={(message) =&gt; console.log(message)}
+  showVoiceButton
+  showAttachmentButton
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using default chat input — no standalone usage</div>
+  </div>
+
+  <!-- CopilotChatAssistantMessage -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🤖</div>
+      <div>
+        <div class="card-title">CopilotChatAssistantMessage <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Pre-styled assistant message bubble</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 component specifically for assistant messages with built-in typing indicator, streaming support, and action button rendering.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotChatAssistantMessage } from "@copilotkit/react-ui";
+
+&lt;CopilotChatAssistantMessage
+  content="Here's your report..."
+  isStreaming={false}
+  actions={[{ label: "Copy", onClick: copyToClipboard }]}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not needed for current POC</div>
+  </div>
+
+  <!-- CopilotChatUserMessage -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">👤</div>
+      <div>
+        <div class="card-title">CopilotChatUserMessage <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Pre-styled user message bubble</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 component specifically for user messages with built-in attachment rendering and edit functionality.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotChatUserMessage } from "@copilotkit/react-ui";
+
+&lt;CopilotChatUserMessage
+  content="Show me the finance summary"
+  attachments={[{ type: "image", url: "..." }]}
+  onEdit={(newContent) =&gt; updateMessage(newContent)}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not needed for current POC</div>
+  </div>
+
+  <!-- CopilotChatSuggestionView -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">💡</div>
+      <div>
+        <div class="card-title">CopilotChatSuggestionView <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Suggestion pill component</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 component for rendering suggestion pills. Can be used standalone or as a slot in CopilotChatView.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotChatSuggestionView } from "@copilotkit/react-ui";
+
+&lt;CopilotChatSuggestionView
+  suggestions={[
+    { text: "Finance summary", prompt: "Show finance..." },
+    { text: "Top customers", prompt: "Show top 5..." },
+  ]}
+  onSelect={(prompt) =&gt; sendMessage(prompt)}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No suggestion pills implemented</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 3: GENERATIVE UI -->
+<h2 class="section-title">3 · Generative UI Levels <span class="count">(Core Differentiator)</span></h2>
+<div class="grid">
+
+  <!-- L2: In-chat streaming render -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🌊</div>
+      <div>
+        <div class="card-title">L2 · In-chat Streaming Render <span class="badge badge-partial">Partial</span></div>
+        <div class="card-sub">Render React inside the chat bubble while the agent streams</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>The <code>render</code> prop of <code>useCopilotAction</code> receives <code>{ args, status }</code> live as the model streams args. This lets you show a loading skeleton, then the final component, all inside the chat thread.</p>
+      <span class="file-tag">app/open/page.tsx (renderMarkdown — basic)</span>
+      <details><summary>▶ Full streaming render pattern</summary><pre><code>useCopilotAction({
+  name: "renderChart",
+  render: ({ args, status }) =&gt; (
+    &lt;div&gt;
+      {status === "inProgress" &amp;&amp; &lt;Skeleton /&gt;}
+      {status === "complete"   &amp;&amp; &lt;GenChart spec={args} /&gt;}
+    &lt;/div&gt;
+  ),
+  handler: async ({ kind, data }) =&gt; {
+    // runs after agent finishes streaming
+    setCharts(c =&gt; [{ kind, data }, ...c]);
+    return "rendered";
+  },
+});</code></pre></details>
+    </div>
+    <div class="status-strip partial">⚠️ renderMarkdown uses render:, but no status-aware progressive rendering</div>
+  </div>
+
+  <!-- L3: Controlled -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🎛️</div>
+      <div>
+        <div class="card-title">L3 · Controlled Generative UI <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Agent calls typed actions; you render specific components</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>The frontend pre-declares strongly-typed UI actions. The agent picks which one to call and with what data. You retain full control over the rendering logic.</p>
+      <span class="file-tag">app/controlled/page.tsx</span><span class="file-tag">app/page.tsx</span>
+      <details><summary>▶ Our actions</summary><pre><code>// 5 typed actions on Dashboard:
+showPieChart, showChart, selectDomain, renderDomainSummary, clearCharts
+
+// 2 typed actions on /controlled:
+showFlightOptions (→ FlightCard)
+showPieChart      (→ GenPieChart)</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Fully implemented on Dashboard + L3 page</div>
+  </div>
+
+  <!-- L4: Declarative -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">L4 · Declarative (A2UI) Generative UI <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Agent emits JSON spec; frontend resolves components</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Single <code>renderUI(specs)</code> action. Agent returns an array of <code>{ component, props }</code>. The <code>A2UICatalog</code> maps component names to React elements. Maximum flexibility — one action, infinite layouts.</p>
+      <span class="file-tag">app/declarative/page.tsx</span><span class="file-tag">components/A2UICatalog.tsx</span>
+      <details><summary>▶ Catalog components</summary><pre><code>// Supported: Stat | Pie | Chart | Table | Callout
+// Chart kinds: pie | donut | bar | hbar | line | area | scatter
+// Multi-series: { name:'Jan', revenue:120, cost:80 } + series:['revenue','cost']</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Full catalog with 5 components + 7 chart kinds. Event stream confirms renderUI firing with complex specs.</div>
+  </div>
+
+  <!-- L5: Open GenUI -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔓</div>
+      <div>
+        <div class="card-title">L5 · Open Generative UI <span class="badge badge-partial">Partial</span></div>
+        <div class="card-sub">Agent generates arbitrary UI — no pre-declared schema</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>True open GenUI: the agent can produce any structured output and the frontend parses it at runtime. Full version uses <code>@hashbrownai/react</code> or a JSON schema passed via <code>useAgentContext</code>. Our POC approximates it with a <code>renderMarkdown</code> action.</p>
+      <span class="file-tag">app/open/page.tsx</span>
+      <details><summary>▶ Full open GenUI (not implemented)</summary><pre><code>import { useAgentContext } from "@copilotkit/react-core/v2";
+import { s } from "@hashbrownai/core";
+import { useUiKit, exposeComponent } from "@hashbrownai/react";
+
+const kit = useUiKit({ components: [
+  exposeComponent(Card, { name: "card", children: "any" }),
+  exposeComponent(SimpleChart, {
+    name: "chart",
+    props: { labels: s.array("Labels", s.string("")), values: s.array("Values", s.number("")) },
+  }),
+]});
+useAgentContext({ description: "output_schema", value: s.toJsonSchema(kit.schema) });
+// Render: kit.render(parsedResponse)</code></pre></details>
+    </div>
+    <div class="status-strip partial">⚠️ Markdown-only approximation; real Hashbrown/useAgentContext schema not wired</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 4: BACKEND / AGENT -->
+<h2 class="section-title">4 · Backend Agent &amp; LangGraph Integration <span class="count">(Python)</span></h2>
+<div class="grid">
+
+  <!-- CopilotKitMiddleware -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔧</div>
+      <div>
+        <div class="card-title">CopilotKitMiddleware <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Official frontend-tool injection middleware</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Wraps every model call to inject <code>state.copilotkit.actions</code> (frontend tools like <code>renderUI</code>) into the LLM's tool list, intercepts frontend tool calls so the ToolNode doesn't execute them, then restores them so AG-UI streams them to the browser. This is the fix for the original "model never calls renderUI" bug.</p>
+      <span class="file-tag">backend/agent.py</span>
+      <details><summary>▶ Our usage</summary><pre><code>from copilotkit import CopilotKitMiddleware, CopilotKitState
+from langchain.agents import create_agent
+
+return create_agent(
+    model=llm,
+    tools=backend_tools,          # 14 SQLite/analytics tools
+    middleware=[CopilotKitMiddleware()],
+    state_schema=CopilotKitState,
+    system_prompt=get_system_prompt(),
+    checkpointer=MemorySaver(),
+)</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Implemented. Event stream shows before_agent → model → after_model → after_agent lifecycle.</div>
+  </div>
+
+  <!-- CopilotKitState -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🗃️</div>
+      <div>
+        <div class="card-title">CopilotKitState <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Official LangGraph state schema for CopilotKit</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Typed <code>TypedDict</code> with <code>messages</code> and <code>copilotkit</code> keys pre-declared, so the graph doesn't silently drop action metadata between nodes.</p>
+      <span class="file-tag">backend/agent.py</span>
+    </div>
+    <div class="status-strip done">✅ Using as state_schema in create_agent</div>
+  </div>
+
+  <!-- LangGraphAGUIAgent -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🌉</div>
+      <div>
+        <div class="card-title">LangGraphAGUIAgent <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">AG-UI SSE bridge — exposes the graph over HTTP</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Wraps the compiled graph and mounts it at <code>/api/copilotkit/agents/&lt;name&gt;</code> as an SSE stream. Handles <code>RUN_STARTED</code>, <code>TOOL_CALL_*</code>, <code>STATE_SNAPSHOT</code>, <code>RUN_FINISHED</code> events. Requires a checkpointer.</p>
+      <span class="file-tag">backend/main.py</span>
+      <details><summary>▶ Our usage</summary><pre><code>from copilotkit import LangGraphAGUIAgent
+add_langgraph_fastapi_endpoint(
+    app=app,
+    agent=LangGraphAGUIAgent(
+        name="copilotkit-agent",
+        graph=build_agent(),
+    ),
+    path="/api/copilotkit",
+)</code></pre></details>
+    </div>
+    <div class="status-strip done">✅ Fully wired. Clean RUN_FINISHED in all event streams.</div>
+  </div>
+
+  <!-- Multi-agent routing -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🤖</div>
+      <div>
+        <div class="card-title">Multi-Agent Routing <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Route chat to different agents per domain/page</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit supports registering multiple named agents. The frontend can switch the active agent dynamically, enabling domain-specific specialists (e.g. a finance agent vs. HR agent) or an orchestrator that delegates.</p>
+      <details><summary>▶ Sample: per-domain agents</summary><pre><code># backend/main.py
+add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
+    name="finance-agent", graph=build_finance_agent()))
+add_langgraph_fastapi_endpoint(app, LangGraphAGUIAgent(
+    name="hr-agent", graph=build_hr_agent()))
+
+# frontend: switch on domain change
+&lt;CopilotKit
+  runtimeUrl="/api/copilotkit"
+  agent={activeDomain + "-agent"}   // dynamic!
+&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Single agent handles all 4 domains — no specialization</div>
+  </div>
+
+  <!-- expose_state -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📤</div>
+      <div>
+        <div class="card-title">expose_state (CopilotKitMiddleware) <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Surface LangGraph state into the system prompt automatically</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Pass <code>expose_state=True</code> (or a list of keys) to <code>CopilotKitMiddleware</code>. The middleware will serialize those state keys and append them as a "Current agent state:" note to the system message — no custom prompt engineering needed.</p>
+      <details><summary>▶ Sample</summary><pre><code>CopilotKitMiddleware(expose_state=["active_domain", "last_query"])
+# or: expose_state=True  to expose all non-underscore keys</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using expose_state=False (default) — state not surfaced into prompt</div>
+  </div>
+
+  <!-- Streaming tool progress -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⏳</div>
+      <div>
+        <div class="card-title">Intermediate State / copilotkit_emit_state <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Stream in-progress state snapshots to the frontend</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>While a long tool runs, emit partial state snapshots to the browser (e.g. "step 1/3 done"). The frontend receives <code>STATE_SNAPSHOT</code> events and can show a progress bar.</p>
+      <details><summary>▶ Sample (LangGraph emit)</summary><pre><code>from copilotkit.langgraph import copilotkit_emit_state
+
+async def long_tool(state):
+    await copilotkit_emit_state(config, {"progress": 33, "step": "fetching data"})
+    # ... do work ...
+    await copilotkit_emit_state(config, {"progress": 66, "step": "aggregating"})
+    return result</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No progress streaming — tools return immediately</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 5: AG-UI PROTOCOL -->
+<h2 class="section-title">5 · AG-UI Protocol &amp; Event Types <span class="count">(Transport)</span></h2>
+<div class="grid">
+
+  <!-- Core events -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📡</div>
+      <div>
+        <div class="card-title">Core AG-UI Events <span class="badge badge-oss">OSS</span></div>
+        <div class="card-sub">Handled by the adapter — no custom code needed</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>The <code>ag_ui_langgraph</code> adapter emits all standard events automatically. Confirmed in our event stream.</p>
+      <ul style="font-size:.82rem;color:#334155;margin-left:16px;margin-top:6px">
+        <li><code>RUN_STARTED</code> / <code>RUN_FINISHED</code></li>
+        <li><code>TEXT_MESSAGE_START/CONTENT/END</code> — streaming text</li>
+        <li><code>TOOL_CALL_START/ARGS/END</code> — tool execution</li>
+        <li><code>STATE_SNAPSHOT</code> — full state sync</li>
+        <li><code>MESSAGES_SNAPSHOT</code> — message history sync</li>
+        <li><code>STEP_STARTED/FINISHED</code> — graph node lifecycle</li>
+      </ul>
+    </div>
+    <div class="status-strip oss">🔷 All events confirmed in production event stream</div>
+  </div>
+
+  <!-- Custom AG-UI events -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📨</div>
+      <div>
+        <div class="card-title">Custom AG-UI Events <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Emit named custom events from the graph to the browser</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Use <code>copilotkit_emit_message</code> or dispatch a <code>CUSTOM</code> event from a tool to send ad-hoc notifications (alerts, toasts, telemetry) to the frontend without going through the chat UI.</p>
+      <details><summary>▶ Sample</summary><pre><code>from copilotkit.langgraph import copilotkit_emit_message
+
+await copilotkit_emit_message(config, {
+    "type": "CUSTOM",
+    "name": "data_loaded",
+    "value": { "rows": 222, "domain": "finance" }
+})
+
+# Frontend:
+import { useCoAgentStateRender } from "@copilotkit/react-core";
+useCoAgentStateRender({ name: "data_loaded",
+  render: ({ state }) => &lt;Toast msg={state.rows + " rows loaded"} /&gt; });</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — toast/notification system could use this</div>
+  </div>
+
+  <!-- Thread management -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🧵</div>
+      <div>
+        <div class="card-title">Thread / Session Persistence <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Named conversation threads with history across page reloads</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit supports persistent threads (stored server-side or in a DB). Pass <code>threadId</code> to <code>&lt;CopilotKit&gt;</code> to resume a conversation. Currently using <code>MemorySaver</code> which loses state on restart.</p>
+      <details><summary>▶ Sample: persistent thread</summary><pre><code>// frontend: store threadId in localStorage
+const [tid] = useState(() =&gt; localStorage.getItem("tid") || crypto.randomUUID());
+useEffect(() =&gt; localStorage.setItem("tid", tid), [tid]);
+
+&lt;CopilotKit runtimeUrl="..." agent="..." threadId={tid}&gt;
+
+// backend: swap MemorySaver for SqliteSaver or RedisSaver
+from langgraph.checkpoint.sqlite import SqliteSaver
+checkpointer = SqliteSaver.from_conn_string("checkpoints.db")</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Using in-process MemorySaver — history lost on backend restart</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 6: ADVANCED FEATURES -->
+<h2 class="section-title">6 · Advanced &amp; Enterprise Features</h2>
+<div class="grid">
+
+  <!-- MCP Apps UI -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔌</div>
+      <div>
+        <div class="card-title">MCP Apps — UI Rendering from MCP Servers <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Render interactive UI components from MCP servers directly in chat</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Revolutionary feature: MCP servers that expose tools with associated UI resources. When the agent calls one of these tools, CopilotKit automatically fetches and renders the UI component in the chat — no additional frontend code required. Full interactivity with HTML, CSS, and JavaScript. Content runs in isolated, secure iframes.</p>
+      <details><summary>▶ How it works</summary><pre><code>// Backend: MCP server exposes a tool with UI resource
+{
+  "tool": "show_weather",
+  "ui_resource": "https://mcp-server.com/ui/weather.html"
+}
+
+// CopilotKit automatically:
+// 1. Agent calls show_weather({ city: "NYC" })
+// 2. Fetches weather.html from MCP server
+// 3. Renders in secure iframe inside chat bubble
+// 4. Component can be fully interactive (buttons, forms, charts)
+
+// No frontend code needed — UI is defined server-side!</code></pre></details>
+      <a class="ext-link" href="https://docs.copilotkit.ai/mcp-apps" target="_blank">→ MCP Apps Documentation</a>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — would enable plugin ecosystem where MCP servers bring their own UI</div>
+  </div>
+
+  <!-- Multimodal / Image attachments -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🖼️</div>
+      <div>
+        <div class="card-title">Multimodal Attachments + Vision <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Upload images, PDFs; agent analyzes with vision models</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Built-in support for image/file uploads in the chat input. CopilotKit handles encoding and passing to vision-capable models (GPT-4 Vision, Claude 3, etc.). Agent can analyze charts, screenshots, documents, and respond with insights.</p>
+      <details><summary>▶ Sample usage</summary><pre><code>// Enable in CopilotChatView
+&lt;CopilotChatView
+  enableAttachments
+  acceptedFileTypes={["image/*", "application/pdf"]}
+/&gt;
+
+// Backend: vision model automatically receives images
+# No code changes needed — CopilotKit handles encoding
+# Model receives: [TextMessage, ImageMessage] in messages array</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Text-only chat — no file upload or vision analysis</div>
+  </div>
+
+  <!-- Voice / Transcription -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🎙️</div>
+      <div>
+        <div class="card-title">Voice Input + Transcription <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Built-in speech-to-text with voice button</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit V2 includes built-in voice input with automatic transcription via browser SpeechRecognition API or OpenAI Whisper. Users can speak their prompts instead of typing.</p>
+      <details><summary>▶ Enable voice</summary><pre><code>&lt;CopilotChatView
+  enableVoiceInput
+  transcriptionService="whisper"  // or "browser"
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Keyboard-only input — no voice support</div>
+  </div>
+
+  <!-- Inspector / Debug tools -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔍</div>
+      <div>
+        <div class="card-title">Inspector &amp; Debug Tools <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Hook Explorer, Event Inspector, Debug Mode</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>V2 dev tools: Hook Explorer shows all registered hooks/tools/renderers in real-time. Event Inspector logs all AG-UI protocol events. Debug Mode highlights which components are rendering and why.</p>
+      <details><summary>▶ Enable inspector</summary><pre><code>&lt;CopilotKit
+  runtimeUrl="..."
+  inspector={{
+    enabled: process.env.NODE_ENV === "development",
+    position: "bottom-right",
+    showEvents: true,
+    showHooks: true,
+  }}
+/&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No inspector UI — debugging via browser console only</div>
+  </div>
+
+  <!-- Human-in-the-loop -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🛑</div>
+      <div>
+        <div class="card-title">Human-in-the-Loop (HITL) <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Pause agent, ask user to confirm, resume</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>The agent can emit an <code>interrupt</code> and wait for the user to approve/reject an action (e.g. "Are you sure you want to delete these 50 records?"). CopilotKit surfaces an approval UI in chat. Requires LangGraph <code>interrupt()</code> + <code>Command(resume=...)</code>.</p>
+      <details><summary>▶ Sample (LangGraph tool)</summary><pre><code>from langgraph.types import interrupt, Command
+
+@tool
+async def delete_records(table: str, ids: list[int]):
+    """Delete records after user confirmation."""
+    approval = interrupt({
+        "question": f"Delete {len(ids)} rows from {table}?",
+        "options": ["yes", "no"],
+    })
+    if approval != "yes":
+        return "Cancelled."
+    # ... do delete
+    return f"Deleted {len(ids)} rows."</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No confirmation dialogs — all actions fire immediately</div>
+  </div>
+
+  <!-- useCoAgentStateRender -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🖼️</div>
+      <div>
+        <div class="card-title">useCoAgentStateRender <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Render LangGraph state as a live side panel</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Subscribes to a specific key in <code>STATE_SNAPSHOT</code> events and renders it as a React component outside the chat. Perfect for a live "agent scratchpad" or progress panel.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useCoAgentStateRender } from "@copilotkit/react-core";
+
+useCoAgentStateRender({
+  name: "copilotkit-agent",
+  render: ({ state, status }) =&gt; (
+    &lt;div className="scratchpad"&gt;
+      &lt;p&gt;Status: {status}&lt;/p&gt;
+      &lt;pre&gt;{JSON.stringify(state, null, 2)}&lt;/pre&gt;
+    &lt;/div&gt;
+  ),
+});</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Agent state not visualised outside chat</div>
+  </div>
+
+  <!-- useCoAgent -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔗</div>
+      <div>
+        <div class="card-title">useCoAgent <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Two-way bidirectional state sync between frontend and LangGraph</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Exposes <code>state</code> and <code>setState</code> that are directly synced with <code>CopilotKitState</code> in the graph. When the user clicks a button on the page, that state change is reflected in the agent's next invocation automatically.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { useCoAgent } from "@copilotkit/react-core";
+
+interface AgentState { activeDomain: string; filter: string; }
+
+const { state, setState } = useCoAgent&lt;AgentState&gt;({
+  name: "copilotkit-agent",
+  initialState: { activeDomain: "finance", filter: "" },
+});
+
+// Now state.activeDomain === what's in the LangGraph state
+// setState({ activeDomain: "hr" }) will update both frontend + next agent call</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ We duplicate state in React (useState) and only pass it via useCopilotReadable</div>
+  </div>
+
+  <!-- Agentic tasks / background runs -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⚙️</div>
+      <div>
+        <div class="card-title">Agentic Background Tasks <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Trigger long-running agent runs from code, not user chat</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Use <code>useCopilotChat</code> to fire off background agentic tasks (e.g. nightly report generation) and stream results back into the UI when done. The agent runs independently of user interaction.</p>
+      <details><summary>▶ Sample</summary><pre><code>const { sendMessage } = useCopilotChat();
+
+// Triggered by a cron or button — not by user typing
+useEffect(() =&gt; {
+  if (isMarketClose) {
+    sendMessage({
+      content: "Generate end-of-day finance summary and post to Slack",
+      role: MessageRole.System,
+    });
+  }
+}, [isMarketClose]);</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ All interactions are user-initiated chat only</div>
+  </div>
+
+  <!-- MCP integration -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔌</div>
+      <div>
+        <div class="card-title">MCP Tool Integration <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Connect Model Context Protocol servers as agent tools</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Mount any MCP server (filesystem, GitHub, Slack, databases) as tools the agent can call. CopilotKit/LangChain supports MCP via <code>langchain_mcp_adapters</code>.</p>
+      <details><summary>▶ Sample (Python backend)</summary><pre><code>from langchain_mcp_adapters.client import MultiServerMCPClient
+
+async with MultiServerMCPClient({
+    "filesystem": {
+        "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+        "transport": "stdio",
+    },
+}) as mcp_client:
+    mcp_tools = mcp_client.get_tools()
+    agent = create_agent(model=llm, tools=[*backend_tools, *mcp_tools], ...)</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No MCP tools — only custom SQLite tools</div>
+  </div>
+
+  <!-- Auth / Headers -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔒</div>
+      <div>
+        <div class="card-title">Auth &amp; Per-Request Headers <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Pass JWT / API key to the backend with every request</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit forwards custom headers to the backend runtime. Use this for multi-tenant auth: the FastAPI endpoint reads the token, identifies the user, and scopes the DB query.</p>
+      <details><summary>▶ Sample</summary><pre><code>// Frontend
+&lt;CopilotKit headers={{ Authorization: `Bearer ${session.token}` }}&gt;
+
+# Backend (FastAPI)
+from fastapi import Header, HTTPException
+async def verify(authorization: str = Header(None)):
+    if not is_valid(authorization): raise HTTPException(401)
+    return decode_user(authorization)</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ POC has no auth — single shared DB, no user scoping</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 7: OBSERVABILITY -->
+<h2 class="section-title">7 · Observability &amp; DevEx</h2>
+<div class="grid">
+
+  <!-- LangSmith -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔭</div>
+      <div>
+        <div class="card-title">LangSmith Tracing <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Full trace of every LLM call, tool invocation, and token cost</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Add two env vars to get every run traced in LangSmith's UI — tokens, latency, costs, tool call chains.</p>
+      <details><summary>▶ Setup</summary><pre><code># backend/.env
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_API_KEY=ls__...
+LANGCHAIN_PROJECT=copilotkit-poc</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ No tracing configured — no visibility into costs or latency</div>
+  </div>
+
+  <!-- CopilotKit dev tools -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🛠️</div>
+      <div>
+        <div class="card-title">CopilotKit DevTools / Cloud <span class="badge badge-oss">OSS</span></div>
+        <div class="card-sub">Debug panel for action registry and state</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit Cloud provides a dashboard to inspect registered actions, test prompts, and view agent run logs. Local devtools can be enabled via the <code>showDevConsole</code> prop.</p>
+      <details><summary>▶ Enable dev console</summary><pre><code>&lt;CopilotKit
+  runtimeUrl="..."
+  showDevConsole={process.env.NODE_ENV === "development"}
+&gt;</code></pre></details>
+    </div>
+    <div class="status-strip oss">🔷 Available in framework — not configured in POC</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 8: DATA LAYER -->
+<h2 class="section-title">8 · Data &amp; Tools Layer <span class="count">(POC-specific)</span></h2>
+<div class="grid">
+
+  <!-- Structured SQL tools -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🗄️</div>
+      <div>
+        <div class="card-title">Structured SQL Aggregation Tools <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">group_by_count/sum/avg, time_series, top_n, run_sql</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>6 chart-ready aggregation tools that return <code>[{name, value}]</code> directly. These replaced raw <code>select_all_rows</code> and eliminated the agent looping/aggregating-in-its-head pattern.</p>
+      <span class="file-tag">backend/tools/sqlite_tools.py</span>
+    </div>
+    <div class="status-strip done">✅ All 6 tools verified via production event streams</div>
+  </div>
+
+  <!-- Domain summary tools -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">Domain Summary Tools <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">finance_summary, hr_summary, healthcare_summary, wireless_summary</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Pre-aggregated summary tools that return KPIs per domain in one call. Used by the dashboard for quick stat cards.</p>
+      <span class="file-tag">backend/tools/analytics_tools.py</span>
+    </div>
+    <div class="status-strip done">✅ All 4 domain summaries confirmed working</div>
+  </div>
+
+  <!-- RAG / vector search -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔍</div>
+      <div>
+        <div class="card-title">RAG / Vector Search Tool <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Semantic search over unstructured documents</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Add a <code>search_documents</code> tool backed by a vector store (FAISS, Chroma, pgvector). Enables Q&amp;A over PDFs, HR policies, contracts alongside the SQLite data.</p>
+      <details><summary>▶ Sample (LangChain + FAISS)</summary><pre><code">from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+
+vectorstore = FAISS.load_local("./faiss_index", OpenAIEmbeddings())
+retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+
+@tool
+def search_documents(query: str) -&gt; str:
+    """Semantic search over HR policies and contracts."""
+    docs = retriever.invoke(query)
+    return "\n\n".join(d.page_content for d in docs)</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Only structured SQLite data — no document search</div>
+  </div>
+
+  <!-- Tool error handling -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🛡️</div>
+      <div>
+        <div class="card-title">Tool Error Handling (_safe wrapper) <span class="badge badge-done">Done</span></div>
+        <div class="card-sub">Prevent SSE stream teardown on tool exceptions</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Every tool is wrapped in <code>_safe()</code> which catches all exceptions and returns <code>{"error": "..."}</code> instead of raising. This prevents the AG-UI stream from closing with <code>INCOMPLETE_STREAM</code>.</p>
+      <span class="file-tag">backend/agent.py</span>
+    </div>
+    <div class="status-strip done">✅ All 14 tools wrapped with _safe()</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── SECTION 9: PLATFORM & DEPLOYMENT -->
+<h2 class="section-title">9 · Platform & Deployment Options</h2>
+<div class="grid">
+
+  <!-- React Native -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📱</div>
+      <div>
+        <div class="card-title">React Native Support <span class="badge badge-oss">OSS</span></div>
+        <div class="card-sub">Use CopilotKit in mobile apps</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit provides React Native components and runtime adapters. Build the same agentic experience on iOS/Android with <code>@copilotkit/react-native</code>.</p>
+      <details><summary>▶ Sample</summary><pre><code>import { CopilotKit, CopilotChat } from "@copilotkit/react-native";
+
+&lt;CopilotKit runtimeUrl="https://api.yourapp.com/copilotkit"&gt;
+  &lt;CopilotChat /&gt;
+&lt;/CopilotKit&gt;</code></pre></details>
+    </div>
+    <div class="status-strip oss">🔷 Framework-provided — POC is web-only</div>
+  </div>
+
+  <!-- AWS AgentCore -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">☁️</div>
+      <div>
+        <div class="card-title">AWS AgentCore Deployment <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">One-click deploy LangGraph agents to AWS</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit integrates with AWS AgentCore for serverless LangGraph deployment. Automatically provisions Lambda, DynamoDB checkpointers, API Gateway, and CloudWatch logging.</p>
+      <details><summary>▶ Deploy command</summary><pre><code># Install AgentCore CLI
+npm install -g @aws/agentcore-cli
+
+# Deploy from backend/
+agentcore deploy \
+  --agent-name copilotkit-agent \
+  --entry-point agent.py:build_agent \
+  --checkpointer dynamodb</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Running locally on FastAPI — no cloud deployment</div>
+  </div>
+
+  <!-- CopilotKit Cloud Observability -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">CopilotKit Cloud — Premium Observability <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Hosted tracing, analytics, and monitoring dashboard</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit Cloud is a managed observability platform: full trace replay, token cost tracking, user analytics, A/B testing, and prompt versioning. Enterprise alternative to LangSmith.</p>
+      <details><summary>▶ Enable</summary><pre><code>&lt;CopilotKit
+  runtimeUrl="..."
+  publicApiKey="ck_live_..."  // from cloud.copilotkit.ai
+/&gt;
+
+// Automatically sends telemetry to CopilotKit Cloud dashboard</code></pre></details>
+      <a class="ext-link" href="https://cloud.copilotkit.ai" target="_blank">→ CopilotKit Cloud</a>
+    </div>
+    <div class="status-strip todo">❌ No observability configured — zero visibility into production usage</div>
+  </div>
+
+  <!-- A2A Protocol -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🤝</div>
+      <div>
+        <div class="card-title">A2A Protocol — Agent-to-Agent Communication <span class="badge badge-todo">Todo</span></div>
+        <div class="card-sub">Let agents call other agents as tools</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>CopilotKit supports the Agent-to-Agent (A2A) protocol: one agent can invoke another agent as if it were a tool. Enables agent hierarchies, delegation, and specialization without tight coupling.</p>
+      <details><summary>▶ Sample</summary><pre><code># Agent A can call Agent B
+from copilotkit.a2a import create_agent_tool
+
+finance_agent_tool = create_agent_tool(
+    name="finance_specialist",
+    url="https://api.yourapp.com/copilotkit/agents/finance-agent",
+    description="Handles all finance-related queries",
+)
+
+# Main orchestrator agent
+agent = create_agent(
+    tools=[finance_agent_tool, hr_agent_tool, ...],
+    ...
+)</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Single monolithic agent — no agent-to-agent delegation</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ──────────────────────────────────────────── ROADMAP TABLE -->
+<h2 class="section-title">📌 Prioritised Roadmap — What to Build Next</h2>
+<div style="overflow-x:auto;border-radius:12px;overflow:hidden;border:1px solid var(--slate-bd)">
+<table class="roadmap">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Feature</th>
+      <th>Why it matters for this POC</th>
+      <th>Effort</th>
+      <th>Priority</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>useAgent / useAgentContext (V2 state sync)</strong></td>
+      <td>Migrate from V1 useState + useCopilotReadable to V2 useAgent for true bidirectional state sync. activeDomain, filter state would live in one place and auto-sync with the graph.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>useSuggestions + suggestion pills</strong></td>
+      <td>Add quick-prompt buttons (💰 Finance, 👥 HR, etc.) using V2 useSuggestions hook. Zero typing for demos — shows modern UX patterns.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Thread persistence (SqliteSaver)</strong></td>
+      <td>Currently history is lost when the backend restarts. Swap MemorySaver → SqliteSaver to keep conversation history across sessions.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>LangSmith or CopilotKit Cloud tracing</strong></td>
+      <td>Right now there's zero visibility into token costs or latency. Two env vars enable full traces — essential before any demo to stakeholders.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Human-in-the-loop (HITL) confirmation</strong></td>
+      <td>Required for any write operations (deletes, updates). Uses LangGraph interrupt() + V2 useHumanInTheLoop. Shows the platform's most differentiating feature.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>MCP Apps UI rendering</strong></td>
+      <td>Proof-of-concept for the killer feature: agent calls an MCP tool, CopilotKit auto-renders the UI from the MCP server in an iframe. Shows plugin ecosystem potential.</td>
+      <td><span class="effort effort-high">High</span></td>
+      <td><span class="priority p1">P1</span></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>useRenderTool migration (V2 render hooks)</strong></td>
+      <td>Migrate from useCopilotAction render: prop to V2 useRenderTool + useDefaultRenderTool. Cleaner separation of concerns, wildcard fallback renderer.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><strong>Multimodal attachments + vision</strong></td>
+      <td>Enable image/PDF upload in chat. Agent can analyze charts, screenshots with GPT-4 Vision. Shows cutting-edge AI capability.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><strong>Voice input + transcription</strong></td>
+      <td>Add voice button to chat input with automatic transcription. Great for accessibility and mobile-first demos.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><strong>Inspector & Debug Tools</strong></td>
+      <td>Enable V2 Inspector UI to show live hook registry, event stream, and debug mode. Essential for development and demos to technical audience.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><strong>CopilotChatView with slot customization</strong></td>
+      <td>Migrate from V1 CopilotSidebar/CopilotPopup to V2 CopilotChatView with custom slots for branding (header, footer, message bubbles).</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><strong>useThreads (conversation history UI)</strong></td>
+      <td>Add a sidebar with conversation history using V2 useThreads. Users can switch between past chats, create new threads.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><strong>useCoAgentStateRender (agent scratchpad panel)</strong></td>
+      <td>Show a live "what the agent is doing" side panel pulling from STATE_SNAPSHOT events — great for demos to show the AI reasoning in real-time.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><strong>expose_state in CopilotKitMiddleware</strong></td>
+      <td>Surface activeDomain and current_filter into the system prompt automatically so the agent always knows what the user is looking at without prompt engineering.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p2">P2</span></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><strong>Multi-agent routing (per-domain specialists)</strong></td>
+      <td>Split into Finance Agent, HR Agent, etc. Each has domain-specific tools and a tighter system prompt. An orchestrator agent routes requests.</td>
+      <td><span class="effort effort-high">High</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td><strong>CopilotTextarea (AI-assisted report writing)</strong></td>
+      <td>Add a "Write Report" tab with CopilotTextarea that autocompletes finance/HR analysis text. Shows the platform's document-generation capability.</td>
+      <td><span class="effort effort-low">Low</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td><strong>Intermediate state streaming (progress bar)</strong></td>
+      <td>For long SQL queries or multi-step analysis, emit progress events (33% → 66% → done) using copilotkit_emit_state so the user sees progress.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td><strong>MCP tool integration (filesystem, Slack, GitHub)</strong></td>
+      <td>Connect Slack, Google Sheets, or a second database as MCP servers. Extends the agent's reach without writing custom Python tools.</td>
+      <td><span class="effort effort-med">Medium</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td><strong>Auth &amp; multi-tenancy</strong></td>
+      <td>Pass JWT from Next Auth → FastAPI → per-user DB scoping. Required before any real deployment.</td>
+      <td><span class="effort effort-high">High</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><strong>Full Open GenUI (useComponent + Hashbrown schema)</strong></td>
+      <td>Wire V2 useComponent + useAgentContext with a JSON schema output format so the agent returns structured component trees without predeclared actions. Enables true open generative UI.</td>
+      <td><span class="effort effort-high">High</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td><strong>A2A Protocol (agent-to-agent delegation)</strong></td>
+      <td>Implement agent hierarchy where main orchestrator delegates to specialist agents via A2A protocol. Shows scalability to multi-agent systems.</td>
+      <td><span class="effort effort-high">High</span></td>
+      <td><span class="priority p3">P3</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ──────────────────────────────────────────── QUICK REFERENCE -->
+<h2 class="section-title">📚 Quick Reference — Files &amp; Docs</h2>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
+
+  <div class="card">
+    <div class="card-head"><div class="card-icon">📁</div><div>
+      <div class="card-title">POC File Structure</div>
+    </div></div>
+    <div class="card-body">
+      <pre style="background:#0f172a;padding:12px;border-radius:8px;font-size:.7rem;color:#e2e8f0"><code>frontend/
+  app/
+    layout.tsx            ← CopilotKit provider
+    page.tsx              ← Dashboard (L3 controlled)
+    controlled/page.tsx   ← L3 controlled GenUI
+    declarative/page.tsx  ← L4 declarative GenUI ✅ working
+    open/page.tsx         ← L5 open GenUI
+    api/copilotkit/
+      route.ts            ← Next.js runtime proxy
+  components/
+    A2UICatalog.tsx       ← L4 component resolver
+    GenChart.tsx          ← recharts wrapper (7 kinds)
+    PieChart.tsx          ← basic pie
+    FlightCard.tsx        ← L3 demo card
+  lib/copilot-config.ts   ← shared constants
+
+backend/
+  agent.py                ← create_agent + CopilotKitMiddleware
+  main.py                 ← FastAPI + LangGraphAGUIAgent
+  tools/
+    sqlite_tools.py       ← 10 SQL tools
+    analytics_tools.py    ← 4 domain summaries
+  prompt_instructions.txt ← 80-line system prompt</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-icon">🔗</div><div>
+      <div class="card-title">Documentation Links</div>
+    </div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding-top:12px">
+      <a class="ext-link" href="https://docs.copilotkit.ai" target="_blank">📖 CopilotKit Docs (docs.copilotkit.ai)</a>
+      <a class="ext-link" href="https://docs.copilotkit.ai/langgraph" target="_blank">🐍 LangGraph Integration Guide</a>
+      <a class="ext-link" href="https://docs.langchain.com/oss/python/langchain/frontend/integrations/copilotkit" target="_blank">🔧 LangChain CopilotKit Integration</a>
+      <a class="ext-link" href="https://docs.copilotkit.ai/reference/hooks/useCopilotAction" target="_blank">⚡ useCopilotAction Reference</a>
+      <a class="ext-link" href="https://docs.copilotkit.ai/reference/hooks/useCoAgent" target="_blank">🔗 useCoAgent Reference</a>
+      <a class="ext-link" href="https://docs.copilotkit.ai/concepts/human-in-the-loop" target="_blank">🛑 Human-in-the-Loop Guide</a>
+      <a class="ext-link" href="https://github.com/CopilotKit/CopilotKit" target="_blank">💻 CopilotKit GitHub</a>
+      <a class="ext-link" href="https://ag-ui.com" target="_blank">📡 AG-UI Protocol Spec</a>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /wrapper -->
+
+<footer>
+  Generated May 2026 · CopilotKit POC Feature Audit · 
+  Stack: Next.js 14 · @copilotkit/react-core · FastAPI · LangGraph · CopilotKitMiddleware · SQLite
+</footer>
+
+</body>
+</html>

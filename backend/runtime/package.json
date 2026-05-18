@@ -1,0 +1,12 @@
+{
+  "name": "copilotkit-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.ts"
+  },
+  "dependencies": {
+    "@copilotkit/runtime": "latest",
+    "express": "latest"
+  }
+}

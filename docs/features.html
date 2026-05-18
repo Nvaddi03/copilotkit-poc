@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CopilotKit Feature Catalog · POC</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121933; --ink:#e6ecff; --muted:#97a2c9;
+    --brand:#7c83ff; --brand2:#22d3ee; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --border:#2a335c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:linear-gradient(160deg,#070a1a,#0b1020 60%,#0c1230);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
+  a{color:var(--brand2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{padding:48px 24px 16px;text-align:center}
+  header h1{font-size:36px;margin:0 0 8px;letter-spacing:-.02em}
+  header p{color:var(--muted);max-width:760px;margin:0 auto}
+  .badges{margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .badge{font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:#0e1530;color:var(--muted)}
+  main{max-width:1200px;margin:0 auto;padding:24px}
+  section{margin:28px 0 12px}
+  h2{font-size:22px;margin:24px 0 12px;border-bottom:1px solid var(--border);padding-bottom:6px}
+  h3{margin:0 0 6px;font-size:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+  .card .lvl{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:#1e2a5a;color:#cdd6ff;margin-right:6px}
+  .card .pill{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+  .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .desc{color:var(--muted);font-size:13.5px}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  code{background:#0a1130;border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:#d6deff;font-size:12.5px}
+  pre{background:#080d24;border:1px solid var(--border);border-radius:10px;padding:12px;overflow:auto;font-size:12.5px;color:#d6deff}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+  th{color:#cdd6ff;font-weight:600}
+  .tag-ok{color:var(--ok)} .tag-warn{color:var(--warn)} .tag-bad{color:var(--bad)}
+  .footer{color:var(--muted);text-align:center;padding:24px 12px 40px;font-size:13px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0 8px}
+  .toc a{background:#0e1530;border:1px solid var(--border);padding:6px 10px;border-radius:8px;color:#cdd6ff}
+  .kbd{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:#0a1130;border:1px solid var(--border);padding:1px 6px;border-radius:6px}
+  .demo-link{display:inline-block;margin-top:8px;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🪁 CopilotKit Feature Catalog</h1>
+  <p>An end-to-end map of every CopilotKit capability exercised by this POC: a Next.js 14 frontend (<code>@copilotkit/react-core</code> / <code>react-ui</code>) wired to a FastAPI + LangGraph backend over the AG-UI protocol, backed by a multi-domain SQLite database (Finance / HR / Healthcare / Wireless).</p>
+  <div class="badges">
+    <span class="badge">@copilotkit/react-core 1.10.x</span>
+    <span class="badge">@copilotkit/react-ui 1.10.x</span>
+    <span class="badge">@copilotkit/runtime 1.10.x</span>
+    <span class="badge">copilotkit (py) 0.1.89</span>
+    <span class="badge">ag-ui-langgraph 0.0.35</span>
+    <span class="badge">LangGraph · React-Agent</span>
+    <span class="badge">FastAPI · SQLite</span>
+  </div>
+  <div class="toc">
+    <a href="#l1">L1 · Chat</a>
+    <a href="#l2">L2 · Tools/Actions</a>
+    <a href="#l3">L3 · Controlled GenUI</a>
+    <a href="#l4">L4 · Declarative GenUI</a>
+    <a href="#l5">L5 · Open GenUI</a>
+    <a href="#hooks">React hooks</a>
+    <a href="#backend">Backend</a>
+    <a href="#ops">Run &amp; Ops</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================ -->
+<section id="l1">
+<h2>L1 · Conversational Copilot (chat surfaces)</h2>
+<div class="grid">
+
+  <div class="card">
+    <div class="row"><span class="lvl">L1</span><h3><code>CopilotKit</code> provider</h3></div>
+    <p class="desc">Root provider that wires React to the runtime. Selects which agent to talk to.</p>
+<pre>&lt;CopilotKit runtimeUrl="/api/copilotkit" agent="copilotkit-agent"&gt;
+  {children}
+&lt;/CopilotKit&gt;</pre>
+    <a class="demo-link" href="http://localhost:3000/">▶ Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lvl">L1</span><h3><code>CopilotSidebar</code></h3></div>
+    <p class="desc">Docked, always-visible chat panel. Used on the dashboard.</p>
+<pre>&lt;CopilotSidebar
+  defaultOpen
+  instructions="…system prompt…"
+  labels={{title:"Domain Copilot", initial:"Hi!"}}
+/&gt;</pre>
+    <a class="demo-link" href="http://localhost:3000/">▶ Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lvl">L1</span><h3><code>CopilotPopup</code></h3></div>
+    <p class="desc">Floating bubble that expands to a chat dialog. Used on L3 / L4 demos.</p>
+<pre>&lt;CopilotPopup defaultOpen … /&gt;</pre>
+    <a class="demo-link" href="http://localhost:3000/controlled">▶ Controlled</a>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lvl">L1</span><h3><code>CopilotChat</code></h3></div>
+    <p class="desc">Inline embeddable chat surface – we use it for the L5 open-GenUI page.</p>
+<pre>&lt;CopilotChat instructions="…" labels={{…}} /&gt;</pre>
+    <a class="demo-link" href="http://localhost:3000/open">▶ Open GenUI</a>
+  </div>
+
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="l2">
+<h2>L2 · Tools &amp; Actions (server + client side)</h2>
+
+<div class="grid">
+  <div class="card">
+    <div class="row"><span class="lvl">L2</span><h3>Server-side tools (LangChain <code>@tool</code>)</h3></div>
+    <p class="desc">Pure Python functions exposed to the LLM by the LangGraph agent. The POC ships eight tools spanning four domains.</p>
+<pre># backend/agent.py
+@tool
+def finance_summary() -&gt; dict: ...
+@tool
+def hr_summary() -&gt; dict: ...
+@tool
+def healthcare_summary() -&gt; dict: ...
+@tool
+def wireless_summary() -&gt; dict: ...
+@tool
+def list_tables() -&gt; list[str]: ...
+@tool
+def table_schema(table: str) -&gt; list: ...
+@tool
+def select_all_rows(table: str) -&gt; list: ...
+@tool
+def summarize_table(table: str) -&gt; dict: ...</pre>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lvl">L2</span><h3>Client-side actions (<code>useCopilotAction</code>)</h3></div>
+    <p class="desc">Frontend declares typed callbacks the agent can invoke. Drives generative UI.</p>
+<pre>useCopilotAction({
+  name: "selectDomain",
+  parameters: [{name:"domain", type:"string", required:true}],
+  handler: async ({domain}) =&gt; setActive(domain),
+});</pre>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lvl">L2</span><h3>Readable state (<code>useCopilotReadable</code>)</h3></div>
+    <p class="desc">Pushes UI state into the LLM context every turn so the agent can reason about what the user sees.</p>
+<pre>useCopilotReadable({
+  description: "active domain + per-domain summaries",
+  value: { activeDomain, summaries },
+});</pre>
+  </div>
+</div>
+
+<h3 style="margin-top:18px">Action / tool catalog</h3>
+<table>
+<thead><tr><th>Name</th><th>Side</th><th>Purpose</th><th>Where</th></tr></thead>
+<tbody>
+<tr><td><code>list_tables</code></td><td>backend</td><td>List SQLite tables</td><td><code>agent.py</code></td></tr>
+<tr><td><code>table_schema</code></td><td>backend</td><td>Columns for a table</td><td><code>agent.py</code></td></tr>
+<tr><td><code>select_all_rows</code></td><td>backend</td><td>SELECT * from table</td><td><code>agent.py</code></td></tr>
+<tr><td><code>summarize_table</code></td><td>backend</td><td>Schema + row count</td><td><code>agent.py</code></td></tr>
+<tr><td><code>finance_summary</code></td><td>backend</td><td>Accounts + transactions overview</td><td><code>analytics_tools.py</code></td></tr>
+<tr><td><code>hr_summary</code></td><td>backend</td><td>Employees + payroll overview</td><td><code>analytics_tools.py</code></td></tr>
+<tr><td><code>healthcare_summary</code></td><td>backend</td><td>Patients + appointments overview</td><td><code>analytics_tools.py</code></td></tr>
+<tr><td><code>wireless_summary</code></td><td>backend</td><td>Customers + usage overview</td><td><code>analytics_tools.py</code></td></tr>
+<tr><td><code>selectDomain</code></td><td>frontend</td><td>Switch dashboard focus</td><td><code>app/page.tsx</code></td></tr>
+<tr><td><code>renderDomainSummary</code></td><td>frontend</td><td>Populate a summary card</td><td><code>app/page.tsx</code></td></tr>
+<tr><td><code>showFlightOptions</code></td><td>frontend</td><td>Render typed FlightCards</td><td><code>app/controlled/page.tsx</code></td></tr>
+<tr><td><code>showPieChart</code></td><td>frontend</td><td>Render a pie chart</td><td><code>app/controlled/page.tsx</code></td></tr>
+<tr><td><code>renderUI</code></td><td>frontend</td><td>Render A2UI catalog specs</td><td><code>app/declarative/page.tsx</code></td></tr>
+<tr><td><code>renderMarkdown</code></td><td>frontend</td><td>Inline open-GenUI rendering</td><td><code>app/open/page.tsx</code></td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ============================================================ -->
+<section id="l3">
+<h2>L3 · Controlled Generative UI</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Idea</h3>
+    <p class="desc">The frontend pre-declares <em>strongly-typed</em> components and exposes them as actions. The agent decides <strong>when</strong> to render which, and with <strong>what</strong> data.</p>
+  </div>
+  <div class="card">
+    <h3>Components</h3>
+    <ul>
+      <li><code>FlightCard</code> – airline, route, price, CTA</li>
+      <li><code>GenPieChart</code> – generic recharts pie</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Try it</h3>
+    <ul>
+      <li>“Show 3 flight options from BLR to SFO”</li>
+      <li>“Show a pie chart of HR departments”</li>
+    </ul>
+    <a class="demo-link" href="http://localhost:3000/controlled">▶ Open L3 demo</a>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="l4">
+<h2>L4 · Declarative Generative UI (A2UI catalog)</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Idea</h3>
+    <p class="desc">The agent emits a <em>list of specs</em> – <code>{component, props}</code> – and the frontend picks the React component from a small catalog. One action drives everything.</p>
+<pre>useCopilotAction({
+  name: "renderUI",
+  parameters: [{ name:"specs", type:"object[]", required:true }],
+  handler: async ({specs}) =&gt; setSpecs(specs),
+});</pre>
+  </div>
+  <div class="card">
+    <h3>Catalog</h3>
+    <ul>
+      <li><code>Stat</code> · label + big value</li>
+      <li><code>Pie</code> · title + <code>{name,value}[]</code></li>
+      <li><code>Table</code> · columns + rows</li>
+      <li><code>Callout</code> · tone + text</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Try it</h3>
+    <ul>
+      <li>“Build a finance dashboard”</li>
+      <li>“Summarize wireless usage with stats and a callout”</li>
+    </ul>
+    <a class="demo-link" href="http://localhost:3000/declarative">▶ Open L4 demo</a>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="l5">
+<h2>L5 · Open Generative UI</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Idea</h3>
+    <p class="desc">No pre-declared component shape. The agent can render arbitrary inline UI through a single <code>renderMarkdown</code> action with a <code>render</code> prop – the foundation for true open-GenUI + MCP scenarios.</p>
+<pre>useCopilotAction({
+  name: "renderMarkdown",
+  parameters: [{name:"markdown", type:"string", required:true}],
+  render: ({args}) =&gt; &lt;pre&gt;{args.markdown}&lt;/pre&gt;,
+});</pre>
+  </div>
+  <div class="card">
+    <h3>What lights up</h3>
+    <ul>
+      <li>Inline action UI inside the chat thread</li>
+      <li>Streaming markdown blocks</li>
+      <li>Hook point for MCP tools / openGenerativeUI</li>
+    </ul>
+    <a class="demo-link" href="http://localhost:3000/open">▶ Open L5 demo</a>
+  </div>
+  <div class="card">
+    <h3>Try it</h3>
+    <ul>
+      <li>“Draft a release-notes table for our last sprint”</li>
+      <li>“Plan a 3-step migration from MySQL to Postgres”</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="hooks">
+<h2>React hook reference (used in this POC)</h2>
+<table>
+<thead><tr><th>Hook / Component</th><th>Package</th><th>Used in</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>CopilotKit</code></td><td>@copilotkit/react-core</td><td><code>app/layout.tsx</code></td><td>Root provider, picks runtime + agent</td></tr>
+<tr><td><code>useCopilotReadable</code></td><td>@copilotkit/react-core</td><td><code>app/page.tsx</code></td><td>Expose React state to the LLM</td></tr>
+<tr><td><code>useCopilotAction</code></td><td>@copilotkit/react-core</td><td>all demo pages</td><td>Frontend tools the agent can call</td></tr>
+<tr><td><code>CopilotSidebar</code></td><td>@copilotkit/react-ui</td><td><code>app/page.tsx</code></td><td>Docked chat</td></tr>
+<tr><td><code>CopilotPopup</code></td><td>@copilotkit/react-ui</td><td><code>app/controlled</code>, <code>app/declarative</code></td><td>Floating chat bubble</td></tr>
+<tr><td><code>CopilotChat</code></td><td>@copilotkit/react-ui</td><td><code>app/open</code></td><td>Embedded chat</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ============================================================ -->
+<section id="backend">
+<h2>Backend wiring</h2>
+<div class="grid">
+  <div class="card">
+    <h3>LangGraph agent</h3>
+    <p class="desc">A LangGraph <code>create_react_agent</code> compiled graph with the eight tools above. The system prompt lives in <code>prompt_instructions.txt</code>.</p>
+<pre># backend/agent.py
+agent = create_react_agent(
+    model=ChatOpenAI(model="gpt-4o-mini", temperature=0),
+    tools=[...8 tools...],
+    prompt=get_system_prompt(),
+    name="copilotkit-agent",
+)</pre>
+  </div>
+  <div class="card">
+    <h3>AG-UI mount</h3>
+    <p class="desc">The compiled graph is wrapped as an AG-UI agent and exposed by <code>CopilotKitRemoteEndpoint</code> at <code>/api/copilotkit</code> on FastAPI.</p>
+<pre># backend/main.py
+copilot_agent = LangGraphAGUIAgent(
+    name="copilotkit-agent",
+    graph=compiled_graph,
+    description="Multi-domain SQLite assistant",
+)
+sdk = CopilotKitRemoteEndpoint(agents=[copilot_agent])
+add_fastapi_endpoint(app, sdk, "/api/copilotkit")</pre>
+  </div>
+  <div class="card">
+    <h3>Next.js runtime bridge</h3>
+    <p class="desc">The Next.js App Router endpoint registers the remote agent via <code>LangGraphHttpAgent</code> and forwards GraphQL traffic to FastAPI.</p>
+<pre>// app/api/copilotkit/route.ts
+import {CopilotRuntime, copilotRuntimeNextJSAppRouterEndpoint,
+        ExperimentalEmptyAdapter} from "@copilotkit/runtime";
+import {LangGraphHttpAgent} from "@copilotkit/runtime/langgraph";
+
+const runtime = new CopilotRuntime({
+  agents: {
+    "copilotkit-agent": new LangGraphHttpAgent({
+      url: "http://localhost:8000/api/copilotkit/agents/copilotkit-agent"
+    })
+  }
+});</pre>
+  </div>
+  <div class="card">
+    <h3>Compatibility shim</h3>
+    <p class="desc">copilotkit 0.1.89 calls <code>super().dict_repr()</code> on a base class that lacks it (ag-ui-langgraph 0.0.35). A small monkey-patch in <code>main.py</code> restores the contract.</p>
+<pre>from ag_ui_langgraph import LangGraphAgent as Base
+if not hasattr(Base, "dict_repr"):
+    Base.dict_repr = lambda self: {
+        "name": self.name,
+        "description": self.description or "",
+    }</pre>
+  </div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="ops">
+<h2>Run &amp; Ops</h2>
+<div class="grid">
+  <div class="card">
+    <h3>One-shot control script</h3>
+<pre>./scripts/devctl.sh start     # backend (8000) + frontend (3000)
+./scripts/devctl.sh stop
+./scripts/devctl.sh restart
+./scripts/devctl.sh status
+./scripts/devctl.sh logs backend|frontend</pre>
+    <p class="desc">PID files in <code>.run/</code>, log files in <code>.run/logs/</code>. Auto-activates <code>.venv</code> and runs <span class="kbd">npm install</span> if needed.</p>
+  </div>
+  <div class="card">
+    <h3>URLs</h3>
+    <ul>
+      <li><a href="http://localhost:3000/">Frontend dashboard</a></li>
+      <li><a href="http://localhost:3000/controlled">L3 controlled</a></li>
+      <li><a href="http://localhost:3000/declarative">L4 declarative</a></li>
+      <li><a href="http://localhost:3000/open">L5 open</a></li>
+      <li><a href="http://localhost:8000/health">Backend /health</a></li>
+      <li><a href="http://localhost:8000/api/copilotkit">Backend CopilotKit info page</a></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Data model (SQLite)</h3>
+    <ul>
+      <li><strong>Finance:</strong> accounts, transactions</li>
+      <li><strong>HR:</strong> employees, payroll</li>
+      <li><strong>Healthcare:</strong> patients, appointments</li>
+      <li><strong>Wireless:</strong> customers, usage</li>
+    </ul>
+    <p class="desc">Seeded via <code>data/seed.py</code> using Faker.</p>
+  </div>
+</div>
+</section>
+
+<div class="footer">CopilotKit POC · feature catalog · generated for the multi-domain SQLite assistant.</div>
+</main>
+</body>
+</html>
