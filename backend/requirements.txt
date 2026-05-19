@@ -13,3 +13,6 @@ sqlalchemy
 langchain-text-splitters
 langchain-community
 faiss-cpu
+playwright 
+beautifulsoup4
+playwright install chromium

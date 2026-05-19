@@ -1,7 +1,7 @@
 "use client";
 
 import { CopilotPopup } from "@copilotkit/react-ui";
-import { useCopilotAction, useRenderToolCall } from "@copilotkit/react-core";
+import { useCopilotAction, useRenderToolCall, useCopilotReadable } from "@copilotkit/react-core";
 import { FlightCard, type Flight } from "../../components/FlightCard";
 import { GenPieChart, type PieDatum } from "../../components/PieChart";
 import { useState } from "react";
@@ -18,6 +18,20 @@ export default function ControlledPage() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [pie, setPie] = useState<{ title: string; data: PieDatum[] } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  // Expose current flight data to the agent for context
+  useCopilotReadable({
+    description: "Currently displayed flights and their prices",
+    value: {
+      hasFlights: flights.length > 0,
+      flightCount: flights.length,
+      flights: flights.map(f => ({
+        airline: f.airline,
+        route: `${f.from} → ${f.to}`,
+        price: f.price
+      }))
+    }
+  });
 
   useCopilotAction({
     name: "showFlightOptions",
@@ -145,8 +159,16 @@ export default function ControlledPage() {
       )}
 
       <CopilotPopup
+        key="controlled-genui-page"
         defaultOpen
-        instructions="You can render UI by calling showFlightOptions or showPieChart. You can also call copyToClipboard(text, label) to copy any result to the user's clipboard — this runs only in the browser, never on the backend. Always prefer rendering UI rather than dumping JSON."
+        instructions={`You can render UI by calling showFlightOptions or showPieChart. 
+
+IMPORTANT CONTEXT RULES:
+- If flights are currently displayed and user asks for "price comparison" or "comparison chart", use showPieChart with the flight prices (data: [{name: airline + route, value: price}]).
+- If user asks about "these flights" or "this data", they are referring to the currently displayed flights.
+- You can also call copyToClipboard(text, label) to copy any result to the user's clipboard — this runs only in the browser, never on the backend.
+
+Always prefer rendering UI rather than dumping JSON. Maintain conversation context about what data is currently shown.`}
         labels={{
           title: "Controlled GenUI",
           initial: "Ask me to render something! Try 'Show 3 flights from BLR to SFO' or 'Copy a finance summary to clipboard'.",

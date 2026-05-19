@@ -31,6 +31,18 @@ for (const agentName of AGENT_NAMES) {
 
 const runtime = new CopilotRuntime({
   agents: agents as any,
+  // MCP (Model Context Protocol) Servers for carrier comparison
+  mcpServers: [
+    {
+      endpoint: process.env.VERIZON_MCP_URL || "http://localhost:8001",
+    },
+    {
+      endpoint: process.env.ATT_MCP_URL || "http://localhost:8002",
+    },
+    {
+      endpoint: process.env.TMOBILE_MCP_URL || "http://localhost:8003",
+    }
+  ]
 });
 
 // The backend agent provides the LLM, so we use an empty adapter here.

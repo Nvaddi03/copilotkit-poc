@@ -1,0 +1,114 @@
+{
+  "_comment": "This file contains ONLY plan data and promotions.",
+  "_note": "Device data is NOT stored here - devices are scraped live from Verizon's website using scraper.py",
+  "plans": [
+    {
+      "id": "unlimited-welcome",
+      "name": "Unlimited Welcome",
+      "description": "Our most affordable unlimited plan",
+      "price_per_line": {
+        "1": 65,
+        "2": 55,
+        "3": 40,
+        "4": 35,
+        "5": 30
+      },
+      "data": "Unlimited 5G / 4G LTE",
+      "speed": "5G Nationwide",
+      "hotspot": "None",
+      "streaming": "480p SD quality",
+      "international": "Talk, Text & Data to Mexico & Canada",
+      "features": [
+        "Unlimited talk, text & data",
+        "5G Nationwide access",
+        "Mobile Hotspot not included",
+        "SD quality streaming"
+      ]
+    },
+    {
+      "id": "unlimited-plus",
+      "name": "Unlimited Plus",
+      "description": "Premium unlimited with extras",
+      "price_per_line": {
+        "1": 80,
+        "2": 70,
+        "3": 55,
+        "4": 50,
+        "5": 45
+      },
+      "data": "Unlimited Premium 5G / 4G LTE",
+      "speed": "5G Ultra Wideband",
+      "hotspot": "30GB",
+      "streaming": "720p HD quality",
+      "international": "Talk, Text & Data to Mexico & Canada + TravelPass",
+      "perks": [
+        "Disney Bundle (Disney+, Hulu, ESPN+)",
+        "Apple Arcade or Google Play Pass (6 months)",
+        "Apple Music (6 months)"
+      ],
+      "features": [
+        "Unlimited Premium data",
+        "5G Ultra Wideband access",
+        "30GB Mobile Hotspot",
+        "HD quality streaming",
+        "International benefits"
+      ]
+    },
+    {
+      "id": "unlimited-ultimate",
+      "name": "Unlimited Ultimate",
+      "description": "Our best unlimited plan",
+      "price_per_line": {
+        "1": 90,
+        "2": 80,
+        "3": 65,
+        "4": 60,
+        "5": 55
+      },
+      "data": "Unlimited Premium 5G / 4G LTE",
+      "speed": "5G Ultra Wideband",
+      "hotspot": "60GB",
+      "streaming": "4K UHD quality",
+      "international": "Talk, Text & Data to Mexico & Canada + TravelPass + International calling",
+      "perks": [
+        "Disney Bundle (Disney+, Hulu, ESPN+)",
+        "Apple One (included)",
+        "Apple Music Family (included)",
+        "Walmart+ membership"
+      ],
+      "features": [
+        "Unlimited Premium data",
+        "5G Ultra Wideband access",
+        "60GB Mobile Hotspot",
+        "4K UHD quality streaming",
+        "Premium international benefits",
+        "100GB Cloud storage"
+      ]
+    }
+  ],
+  "promotions": [
+    {
+      "id": "byod-discount",
+      "name": "Bring Your Own Device",
+      "description": "Get $540 when you bring your own phone",
+      "discount": 540,
+      "duration_months": 36,
+      "conditions": [
+        "Port in from another carrier",
+        "Select Unlimited plan",
+        "Keep service for 36 months"
+      ]
+    },
+    {
+      "id": "family-discount",
+      "name": "Multi-Line Discount",
+      "description": "Save more with additional lines",
+      "discount_type": "percentage",
+      "savings": "Up to $50/month per line",
+      "conditions": [
+        "4 or more lines",
+        "Unlimited plans"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verizon Device Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-transparent p-0 m-0">
+    <!-- 
+        MCP App UI Component
+        ====================
+        This HTML is automatically fetched and rendered by CopilotKit
+        when the agent calls get_device_info() tool.
+        
+        Data Flow:
+        1. Agent calls: get_device_info({ device_slug: "iphone-15-pro" })
+        2. MCP server returns: { ui_resource: "http://localhost:8001/ui/device-card.html", ui_data: {...} }
+        3. CopilotKit fetches this HTML and renders in iframe
+        4. window.mcpData contains the device data
+    -->
+    
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <!-- Carrier Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🔴</span>
+                <span class="font-bold text-lg">Verizon</span>
+            </div>
+            <span class="text-xs bg-red-800 px-2 py-1 rounded-full" id="data-source">Mock Data</span>
+        </div>
+        
+        <!-- Device Image -->
+        <div class="p-6 flex justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative">
+            <img 
+                id="device-image" 
+                src="https://ss7.vzw.com/is/image/VerizonWireless/apple-iphone-15-pro-natural-titanium?wid=465&hei=465&fmt=webp" 
+                alt="Device" 
+                class="h-72 object-contain drop-shadow-2xl"
+            >
+            <!-- Badge for promotions -->
+            <div id="promo-badge" class="hidden absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                💰 Save $1,000
+            </div>
+        </div>
+        
+        <!-- Device Info -->
+        <div class="p-6">
+            <h2 id="device-name" class="text-2xl font-bold text-gray-800 mb-1">iPhone 15 Pro</h2>
+            <p id="device-brand" class="text-sm text-gray-500 mb-4">Apple</p>
+            
+            <!-- Pricing -->
+            <div class="mb-6">
+                <div class="flex items-baseline gap-2 mb-1">
+                    <span class="text-4xl font-bold text-red-600">$<span id="monthly-price">27.77</span></span>
+                    <span class="text-gray-500">/mo</span>
+                </div>
+                <div class="text-sm text-gray-600">
+                    or <span class="font-semibold">$<span id="full-price">999</span></span> full price
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                    36-month device payment • 0% APR
+                </div>
+            </div>
+            
+            <!-- Storage Selector -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Storage</label>
+                <div id="storage-options" class="grid grid-cols-4 gap-2">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <!-- Colors -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Colors Available</label>
+                <div id="color-options" class="flex gap-2">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <!-- Key Features -->
+            <div class="mb-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Key Features</h3>
+                <ul id="features-list" class="space-y-1 text-sm text-gray-600">
+                    <!-- Dynamically populated -->
+                </ul>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+                <button class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition transform hover:scale-105" onclick="viewOnVerizon()">
+                    View on Verizon.com →
+                </button>
+                <button class="px-4 py-3 border-2 border-red-600 text-red-600 hover:bg-red-50 rounded-lg transition" onclick="compareCarriers()">
+                    🔄
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer Info -->
+        <div class="px-6 pb-4 bg-gray-50 border-t">
+            <div class="flex justify-between items-center text-xs text-gray-500">
+                <span id="timestamp">Updated: Just now</span>
+                <span id="source-badge" class="flex items-center gap-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Live pricing
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================================================================
+        // MCP Data Injection
+        // ====================================================================
+        // CopilotKit passes data via window.mcpData
+        const deviceData = window.mcpData || {
+            name: "iPhone 15 Pro",
+            brand: "Apple",
+            price_monthly: 27.77,
+            price_full: 999,
+            storage_options: ["128GB", "256GB", "512GB", "1TB"],
+            storage_prices: {
+                "128GB": 27.77,
+                "256GB": 30.55,
+                "512GB": 36.11,
+                "1TB": 41.66
+            },
+            colors: ["Natural Titanium", "Blue Titanium", "White Titanium", "Black Titanium"],
+            image_url: "https://ss7.vzw.com/is/image/VerizonWireless/apple-iphone-15-pro-natural-titanium",
+            features: [
+                "A17 Pro chip with 6-core GPU",
+                "Pro camera system (48MP Main, 12MP Ultra Wide, 12MP Telephoto)",
+                "Titanium design - strong and light",
+                "Action button for quick controls"
+            ],
+            promotions: [
+                {
+                    title: "Trade-in Savings",
+                    discount: 1000
+                }
+            ],
+            _source: "mock",
+            selected_storage: "128GB"
+        };
+
+        console.log("📱 Rendering Verizon Device Card:", deviceData);
+
+        // ====================================================================
+        // UI Population
+        // ====================================================================
+        
+        // Basic info
+        document.getElementById('device-name').textContent = deviceData.name;
+        document.getElementById('device-brand').textContent = deviceData.brand;
+        document.getElementById('monthly-price').textContent = deviceData.price_monthly.toFixed(2);
+        document.getElementById('full-price').textContent = deviceData.price_full;
+        document.getElementById('device-image').src = deviceData.image_url;
+        
+        // Data source badge
+        const sourceText = {
+            'cache': '⚡ Cached',
+            'scraping': '🌐 Live Data',
+            'mock': '📦 Demo'
+        };
+        document.getElementById('data-source').textContent = sourceText[deviceData._source] || 'Unknown';
+        
+        // Timestamp
+        const timestamp = deviceData._timestamp ? new Date(deviceData._timestamp) : new Date();
+        document.getElementById('timestamp').textContent = `Updated: ${timestamp.toLocaleTimeString()}`;
+        
+        // Promotions badge
+        if (deviceData.promotions && deviceData.promotions.length > 0) {
+            const promoBadge = document.getElementById('promo-badge');
+            const maxDiscount = Math.max(...deviceData.promotions.map(p => p.discount || 0));
+            promoBadge.textContent = `💰 Save $${maxDiscount}`;
+            promoBadge.classList.remove('hidden');
+        }
+        
+        // Storage options
+        const storageContainer = document.getElementById('storage-options');
+        deviceData.storage_options.forEach((storage) => {
+            const btn = document.createElement('button');
+            const isSelected = storage === deviceData.selected_storage;
+            btn.className = `px-3 py-2 border-2 rounded-lg font-medium text-sm transition ${
+                isSelected 
+                    ? 'bg-red-600 text-white border-red-600' 
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-red-600'
+            }`;
+            btn.textContent = storage;
+            
+            // Update price on click
+            btn.onclick = () => {
+                const newPrice = deviceData.storage_prices[storage] || deviceData.price_monthly;
+                document.getElementById('monthly-price').textContent = newPrice.toFixed(2);
+                
+                // Update button states
+                storageContainer.querySelectorAll('button').forEach(b => {
+                    b.className = 'px-3 py-2 border-2 rounded-lg font-medium text-sm transition bg-white text-gray-700 border-gray-300 hover:border-red-600';
+                });
+                btn.className = 'px-3 py-2 border-2 rounded-lg font-medium text-sm transition bg-red-600 text-white border-red-600';
+            };
+            
+            storageContainer.appendChild(btn);
+        });
+        
+        // Color swatches
+        const colorContainer = document.getElementById('color-options');
+        deviceData.colors.forEach((color, idx) => {
+            const swatch = document.createElement('div');
+            swatch.className = 'relative group cursor-pointer';
+            
+            const circle = document.createElement('div');
+            circle.className = `w-10 h-10 rounded-full border-2 ${
+                idx === 0 ? 'border-red-600' : 'border-gray-300'
+            } hover:border-red-600 transition`;
+            
+            // Color mapping
+            const colorMap = {
+                'Natural': 'linear-gradient(135deg, #D4C5A8, #B8A990)',
+                'Blue': 'linear-gradient(135deg, #4A90E2, #357ABD)',
+                'White': 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
+                'Black': 'linear-gradient(135deg, #2C2C2C, #1A1A1A)'
+            };
+            const colorKey = Object.keys(colorMap).find(k => color.includes(k));
+            circle.style.background = colorMap[colorKey] || '#CCCCCC';
+            
+            // Tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap';
+            tooltip.textContent = color;
+            
+            swatch.appendChild(circle);
+            swatch.appendChild(tooltip);
+            colorContainer.appendChild(swatch);
+        });
+        
+        // Features list
+        const featuresList = document.getElementById('features-list');
+        (deviceData.features || []).slice(0, 4).forEach(feature => {
+            const li = document.createElement('li');
+            li.className = 'flex items-start gap-2';
+            li.innerHTML = `
+                <span class="text-red-600 mt-0.5">✓</span>
+                <span>${feature}</span>
+            `;
+            featuresList.appendChild(li);
+        });
+        
+        // ====================================================================
+        // Interactivity
+        // ====================================================================
+        
+        function viewOnVerizon() {
+            // In real implementation, would open Verizon website
+            alert(`Opening Verizon.com for ${deviceData.name}...`);
+            // window.open(`https://www.verizon.com/smartphones/${deviceData.id}/`, '_blank');
+        }
+        
+        function compareCarriers() {
+            // Trigger comparison with other carriers
+            if (window.parent && window.parent.postMessage) {
+                window.parent.postMessage({
+                    action: 'compare_carriers',
+                    device: deviceData.name
+                }, '*');
+            }
+            alert('Comparing with AT&T and T-Mobile...');
+        }
+        
+        // ====================================================================
+        // Analytics (optional)
+        // ====================================================================
+        console.log('📊 Verizon Device Card Analytics:', {
+            device: deviceData.name,
+            price: deviceData.price_monthly,
+            storage: deviceData.selected_storage,
+            source: deviceData._source
+        });
+    </script>
+</body>
+</html>

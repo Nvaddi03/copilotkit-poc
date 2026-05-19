@@ -284,7 +284,7 @@ export default function OpenGenUIPage() {
             </button>
           ))}
         </div>
-        <div className="h-[65vh] rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div className="h-[600px] rounded-xl border border-slate-200 bg-white">
           <CopilotChat
             instructions={`You have two powerful rendering tools:
 

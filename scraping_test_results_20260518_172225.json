@@ -1,0 +1,57 @@
+{
+  "test_time": "2026-05-18T17:22:13.985766",
+  "carriers": {
+    "verizon": {
+      "carrier": "Verizon",
+      "url": "https://www.verizon.com/smartphones/",
+      "success": true,
+      "data": {
+        "prices_found": [
+          {
+            "selector": "[data-testid*=\"price\"]",
+            "text": "Starts at $5.00/mo"
+          },
+          {
+            "selector": "[data-testid*=\"price\"]",
+            "text": "$36.11/mo"
+          },
+          {
+            "selector": "[data-testid*=\"price\"]",
+            "text": "Starts at $0/mo"
+          }
+        ]
+      },
+      "errors": [],
+      "notes": [
+        "Successfully loaded https://www.verizon.com/smartphones/"
+      ],
+      "screenshot": "test_verizon_172218.png"
+    },
+    "att": {
+      "carrier": "AT&T",
+      "url": "https://www.att.com/buy/phones/",
+      "success": true,
+      "data": {
+        "price_symbols_found": 53
+      },
+      "errors": [],
+      "notes": [
+        "Successfully loaded page"
+      ],
+      "screenshot": "test_att_172222.png"
+    },
+    "tmobile": {
+      "carrier": "T-Mobile",
+      "url": "https://www.t-mobile.com/cell-phones",
+      "success": true,
+      "data": {
+        "price_symbols_found": 175
+      },
+      "errors": [],
+      "notes": [
+        "Successfully loaded page"
+      ],
+      "screenshot": "test_tmobile_172225.png"
+    }
+  }
+}

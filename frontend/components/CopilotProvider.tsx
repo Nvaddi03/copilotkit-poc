@@ -15,10 +15,11 @@
  */
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { CopilotKit } from "@copilotkit/react-core";
 import { COPILOT_RUNTIME_URL, COPILOT_AGENT_NAME } from "../lib/copilot-config";
 
-const THREAD_STORAGE_KEY = "copilotkit-poc-thread-id";
+const THREAD_STORAGE_KEY_PREFIX = "copilotkit-poc-thread-";
 
 // ── Observability log (kept in module scope so it survives re-renders) ──────
 type ObsEntry = { ts: string; event: string; detail: string };
@@ -45,19 +46,20 @@ export default function CopilotProvider({
   children: React.ReactNode;
   agentName?: string;
 }) {
-  // ── Thread ID persistence ────────────────────────────────────────────────
+  const pathname = usePathname();
+  // ── Thread ID persistence (route-specific) ──────────────────────────────
   const [threadId, setThreadId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const stored = localStorage.getItem(THREAD_STORAGE_KEY);
-    if (stored) {
-      setThreadId(stored);
-    } else {
-      const fresh = crypto.randomUUID();
-      localStorage.setItem(THREAD_STORAGE_KEY, fresh);
-      setThreadId(fresh);
-    }
-  }, []);
+    // Create route-specific storage key (e.g., "copilotkit-poc-thread-/controlled")
+    const storageKey = `${THREAD_STORAGE_KEY_PREFIX}${pathname || 'default'}`;
+    
+    // Always generate a fresh thread ID when navigating to a new route
+    // This ensures each module starts with a clean conversation
+    const fresh = crypto.randomUUID();
+    localStorage.setItem(storageKey, fresh);
+    setThreadId(fresh);
+  }, [pathname]);
 
   return (
     <CopilotKit

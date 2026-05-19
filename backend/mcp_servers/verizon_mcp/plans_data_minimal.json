@@ -1,0 +1,20 @@
+{
+  "_comment": "Minimal plan data - only basics needed for cost calculations",
+  "plans": [
+    {
+      "id": "unlimited-welcome",
+      "name": "Unlimited Welcome",
+      "price_per_line": {"1": 65, "2": 55, "3": 40, "4": 35, "5": 30}
+    },
+    {
+      "id": "unlimited-plus",
+      "name": "Unlimited Plus",
+      "price_per_line": {"1": 80, "2": 70, "3": 55, "4": 50, "5": 45}
+    },
+    {
+      "id": "unlimited-ultimate",
+      "name": "Unlimited Ultimate",
+      "price_per_line": {"1": 90, "2": 80, "3": 65, "4": 60, "5": 55}
+    }
+  ]
+}

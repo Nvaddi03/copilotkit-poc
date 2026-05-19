@@ -143,15 +143,16 @@
 <!-- ═══════════════════════════════════════════════════════════ SCOREBOARD -->
 <div class="scorebar">
   <div class="score-item"><div class="score-num" style="color:var(--green)">50</div><div class="score-lbl">✅ Done</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--yellow)">11</div><div class="score-lbl">🔷 N/A</div></div>
-  <div class="score-item"><div class="score-num" style="color:var(--red)">0</div><div class="score-lbl">❌ Todo</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--yellow)">13</div><div class="score-lbl">⚠️ Partial</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--red)">10</div><div class="score-lbl">❌ Todo</div></div>
   <div class="score-item"><div class="score-num" style="color:var(--blue)">6</div><div class="score-lbl">🔷 OSS Only</div></div>
   <div class="progress-wrap">
-    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 75% (50/67 features — 11 N/A: 4 SDK-version + 2 chat primitives + 5 external-service)</div>
+    <div style="font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--slate)">Coverage: 63% (50/79 features — 11 N/A + 12 HTML/UI enhancements identified)</div>
     <div class="progress-bar">
-      <div class="progress-seg" style="width:75%;background:var(--green)"></div>
-      <div class="progress-seg" style="width:10%;background:var(--yellow)"></div>
-      <div class="progress-seg" style="width:9%;background:var(--blue)"></div>
+      <div class="progress-seg" style="width:63%;background:var(--green)"></div>
+      <div class="progress-seg" style="width:16%;background:var(--yellow)"></div>
+      <div class="progress-seg" style="width:13%;background:var(--red)"></div>
+      <div class="progress-seg" style="width:8%;background:var(--blue)"></div>
     </div>
   </div>
 </div>
@@ -1933,6 +1934,479 @@ agent = create_agent(
     </tr>
   </tbody>
 </table>
+</div>
+
+<!-- ──────────────────────────────────────────── SECTION 6: HTML/UI ENHANCEMENTS -->
+<h2 class="section-title">6 · HTML/UI Enhancement Features <span class="count">(From Tutorial Analysis)</span></h2>
+<div class="grid">
+
+  <!-- Loading Skeletons -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">⏳</div>
+      <div>
+        <div class="card-title">Loading Skeletons &amp; States <span class="badge badge-partial">Partial</span></div>
+        <div class="card-sub">Show skeleton UI while data loads (2h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Current: No loading indicators during scraping. Tutorial pattern: Show skeleton UI while data loads.</p>
+      <details><summary>▶ Implementation</summary><pre><code>useComponent({
+  name: "deviceCard",
+  parameters: DeviceCardSchema,
+  render: ({ status, args }) =&gt; {
+    if (status === "executing") {
+      return (
+        &lt;div className="animate-pulse space-y-4"&gt;
+          &lt;div className="h-4 bg-gray-200 rounded w-3/4"&gt;&lt;/div&gt;
+          &lt;div className="h-8 bg-gray-200 rounded"&gt;&lt;/div&gt;
+          &lt;div className="h-4 bg-gray-200 rounded w-1/2"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      );
+    }
+    return &lt;DeviceCard {...args} /&gt;;
+  },
+});</code></pre></details>
+    </div>
+    <div class="status-strip partial">⚠️ Basic loading states exist — enhance with pulsing skeletons during scraping operations</div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔔</div>
+      <div>
+        <div class="card-title">Toast Notifications <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Success/error messages for operations (1h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Show feedback toasts for scraping operations, data fetches, errors.</p>
+      <details><summary>▶ Implementation with react-hot-toast</summary><pre><code>import { toast } from 'react-hot-toast';
+
+// Success
+toast.success('Found iPhone 17 Pro pricing from Verizon', {
+  duration: 3000,
+  icon: '✓',
+});
+
+// Error
+toast.error('Failed to scrape AT&amp;T. Using cached data.', {
+  duration: 5000,
+  icon: '⚠️',
+});
+
+// Loading
+const toastId = toast.loading('Scraping carrier websites...');
+toast.dismiss(toastId);
+toast.success('Comparison complete!');</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — would significantly improve UX feedback</div>
+  </div>
+
+  <!-- Price Badges -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🏆</div>
+      <div>
+        <div class="card-title">Price Comparison Badges <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Visual indicators for best deals (1h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Add badges for "Best Deal", "Trade-in Available", "In Stock".</p>
+      <details><summary>▶ Implementation</summary><pre><code>{isPriceBest &amp;&amp; (
+  &lt;div className="absolute -top-2 -right-2"&gt;
+    &lt;span className="inline-flex items-center px-3 py-1 rounded-full 
+                     text-sm font-medium bg-green-100 text-green-800"&gt;
+      🏆 Best Deal
+    &lt;/span&gt;
+  &lt;/div&gt;
+)}
+
+{hasTradeinOffer &amp;&amp; (
+  &lt;span className="inline-flex items-center px-2 py-1 rounded 
+                   text-xs font-medium bg-blue-100 text-blue-800"&gt;
+    💰 Trade-in Available
+  &lt;/span&gt;
+)}</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — high visual impact for demos</div>
+  </div>
+
+  <!-- Progress Indicators -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">Animated Progress Indicators <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Show scraping progress for multi-carrier queries (30min effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Display parallel progress when scraping multiple carriers.</p>
+      <details><summary>▶ Implementation</summary><pre><code>&lt;div className="space-y-2"&gt;
+  &lt;div className="flex items-center gap-3"&gt;
+    &lt;Spinner className={verizonDone ? "text-green-500" : "animate-spin"} /&gt;
+    &lt;span&gt;Verizon {verizonDone ? "✓" : "..."}&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div className="flex items-center gap-3"&gt;
+    &lt;Spinner className={attDone ? "text-green-500" : "animate-spin"} /&gt;
+    &lt;span&gt;AT&amp;T {attDone ? "✓" : "..."}&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div className="flex items-center gap-3"&gt;
+    &lt;Spinner className={tmobileDone ? "text-green-500" : "animate-spin"} /&gt;
+    &lt;span&gt;T-Mobile {tmobileDone ? "✓" : "..."}&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — shows transparency during multi-step operations</div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Side-by-Side Comparison Table <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Sticky header table for easy comparison (3h effort, ⭐⭐⭐⭐⭐ demo impact)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Table format with sticky headers comparing features across all carriers.</p>
+      <details><summary>▶ Implementation</summary><pre><code>&lt;div className="overflow-x-auto"&gt;
+  &lt;table className="min-w-full divide-y divide-gray-200"&gt;
+    &lt;thead className="bg-gray-50 sticky top-0"&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Feature&lt;/th&gt;
+        &lt;th&gt;&lt;img src="/verizon-logo.png" className="h-8 mx-auto" /&gt;&lt;/th&gt;
+        &lt;th&gt;&lt;img src="/att-logo.png" className="h-8 mx-auto" /&gt;&lt;/th&gt;
+        &lt;th&gt;&lt;img src="/tmobile-logo.png" className="h-8 mx-auto" /&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Monthly Price&lt;/td&gt;
+        &lt;td&gt;${verizonPrice}&lt;/td&gt;
+        &lt;td&gt;${attPrice}&lt;/td&gt;
+        &lt;td&gt;${tmobilePrice}&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — highest demo impact, easy to scan pricing data</div>
+  </div>
+
+  <!-- Flip Cards -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔄</div>
+      <div>
+        <div class="card-title">Interactive Flip Cards <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Hover/click to reveal full features (4h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Front: Pricing summary. Back: Full features list, trade-in options, link.</p>
+      <details><summary>▶ Implementation with CSS 3D transforms</summary><pre><code>&lt;div className="flip-card"&gt;
+  &lt;div className="flip-card-inner"&gt;
+    &lt;div className="flip-card-front"&gt;
+      &lt;h3&gt;{deviceName}&lt;/h3&gt;
+      &lt;p className="text-3xl font-bold"&gt;{price}&lt;/p&gt;
+      &lt;button&gt;View Details&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div className="flip-card-back"&gt;
+      &lt;ul&gt;{features.map(f =&gt; &lt;li&gt;✓ {f}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;a href={carrierLink}&gt;Buy Now →&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+// CSS:
+.flip-card { perspective: 1000px; }
+.flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+.flip-card:hover .flip-card-inner { transform: rotateY(180deg); }</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — high engagement factor for interactive demos</div>
+  </div>
+
+  <!-- Filter & Sort -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔍</div>
+      <div>
+        <div class="card-title">Filter &amp; Sort Controls <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Interactive controls for comparison results (3h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Dropdown sorting (price low-to-high, carrier A-Z) and filter toggles (trade-in, in-stock).</p>
+      <details><summary>▶ Implementation</summary><pre><code>&lt;div className="flex gap-4 mb-6"&gt;
+  &lt;select value={sortBy} onChange={(e) =&gt; setSortBy(e.target.value)}&gt;
+    &lt;option value="price-low"&gt;Price: Low to High&lt;/option&gt;
+    &lt;option value="price-high"&gt;Price: High to Low&lt;/option&gt;
+    &lt;option value="carrier"&gt;Carrier: A-Z&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;button onClick={() =&gt; setShowTradeinOnly(!showTradeinOnly)}&gt;
+    Trade-in Available
+  &lt;/button&gt;
+  &lt;button onClick={() =&gt; setShowInStockOnly(!showInStockOnly)}&gt;
+    In Stock Only
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — gives users control over data presentation</div>
+  </div>
+
+  <!-- Price History Chart -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📈</div>
+      <div>
+        <div class="card-title">Price History Chart <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Show price trends over time (4h effort, requires data persistence)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Line chart showing carrier pricing over weeks/months (requires storing scraped data history).</p>
+      <details><summary>▶ Implementation with Recharts</summary><pre><code>import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+
+const priceHistory = [
+  { date: '05/01', verizon: 30.56, att: 29.99, tmobile: 30.00 },
+  { date: '05/08', verizon: 30.56, att: 30.56, tmobile: 30.00 },
+  { date: '05/15', verizon: 28.99, att: 30.56, tmobile: 29.50 },
+];
+
+&lt;LineChart width={600} height={300} data={priceHistory}&gt;
+  &lt;XAxis dataKey="date" /&gt;
+  &lt;YAxis /&gt;
+  &lt;Tooltip /&gt;
+  &lt;Legend /&gt;
+  &lt;Line type="monotone" dataKey="verizon" stroke="#ff0000" name="Verizon" /&gt;
+  &lt;Line type="monotone" dataKey="att" stroke="#0066cc" name="AT&amp;T" /&gt;
+  &lt;Line type="monotone" dataKey="tmobile" stroke="#e20074" name="T-Mobile" /&gt;
+&lt;/LineChart&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — high insight value, shows pricing trends</div>
+  </div>
+
+  <!-- Collapsible Lists -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📑</div>
+      <div>
+        <div class="card-title">Collapsible Feature Lists <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Collapse long feature lists with "Show more" (2h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Show first 5 features, hide rest behind "Show 8 more" button for cleaner UI.</p>
+      <details><summary>▶ Implementation</summary><pre><code>const [expanded, setExpanded] = useState(false);
+const visibleFeatures = expanded ? features : features.slice(0, 5);
+
+&lt;div className="features"&gt;
+  {visibleFeatures.map(f =&gt; (
+    &lt;div key={f} className="flex items-start gap-2"&gt;
+      &lt;CheckIcon className="w-5 h-5 text-green-500" /&gt;
+      &lt;span className="text-sm"&gt;{f}&lt;/span&gt;
+    &lt;/div&gt;
+  ))}
+  {features.length &gt; 5 &amp;&amp; (
+    &lt;button onClick={() =&gt; setExpanded(!expanded)}&gt;
+      {expanded ? "Show less" : `Show ${features.length - 5} more`}
+    &lt;/button&gt;
+  )}
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — reduces visual clutter</div>
+  </div>
+
+  <!-- Responsive Grid -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📱</div>
+      <div>
+        <div class="card-title">Responsive Grid Layout <span class="badge badge-partial">Partial</span></div>
+        <div class="card-sub">Mobile-optimized 3-column → 1-column layout (2h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Ensure comparison cards look good on mobile with horizontal scroll or stacking.</p>
+      <details><summary>▶ Implementation with Tailwind</summary><pre><code>&lt;div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+  {carriers.map(carrier =&gt; (
+    &lt;div key={carrier.name} className="bg-white rounded-lg shadow-lg p-6"&gt;
+      {/* Card content */}
+    &lt;/div&gt;
+  ))}
+&lt;/div&gt;
+
+// Mobile-specific horizontal scroll:
+&lt;div className="lg:hidden"&gt;
+  &lt;div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"&gt;
+    {carriers.map(carrier =&gt; (
+      &lt;div key={carrier.name} className="min-w-[280px] snap-center"&gt;
+        {/* Card content */}
+      &lt;/div&gt;
+    ))}
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip partial">⚠️ Basic responsiveness exists — enhance with snap scrolling and mobile optimizations</div>
+  </div>
+
+  <!-- Copy to Clipboard -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Copy to Clipboard <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Share functionality for pricing results (30min effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Button to copy comparison results as formatted text.</p>
+      <details><summary>▶ Implementation</summary><pre><code>const copyToClipboard = () =&gt; {
+  const text = `
+iPhone 17 Pro Price Comparison:
+• Verizon: $${verizonPrice}/mo ($${verizonFull})
+• AT&amp;T: $${attPrice}/mo ($${attFull})
+• T-Mobile: $${tmobilePrice}/mo ($${tmobileFull})
+
+Best Deal: ${bestCarrier} 🏆
+  `.trim();
+
+  navigator.clipboard.writeText(text);
+  toast.success('Copied to clipboard!');
+};
+
+&lt;button onClick={copyToClipboard}&gt;
+  &lt;ClipboardIcon className="w-5 h-5" /&gt;
+  Copy Results
+&lt;/button&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — enables easy sharing of comparison data</div>
+  </div>
+
+  <!-- Dark Mode -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🌙</div>
+      <div>
+        <div class="card-title">Dark Mode Toggle <span class="badge badge-todo">To-Do</span></div>
+        <div class="card-sub">Theme switcher for better UX (2h effort)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p>Toggle between light/dark themes with persistent preference.</p>
+      <details><summary>▶ Implementation with Tailwind dark mode</summary><pre><code>const [darkMode, setDarkMode] = useState(false);
+
+useEffect(() =&gt; {
+  if (darkMode) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}, [darkMode]);
+
+&lt;button onClick={() =&gt; setDarkMode(!darkMode)}&gt;
+  {darkMode ? '☀️' : '🌙'}
+&lt;/button&gt;
+
+// In components:
+&lt;div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"&gt;
+  {/* Content */}
+&lt;/div&gt;</code></pre></details>
+    </div>
+    <div class="status-strip todo">❌ Not implemented — nice-to-have for accessibility and user preference</div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- HTML/UI Feature Priority Matrix -->
+<div style="margin-top:24px;background:white;border-radius:14px;border:1px solid #e2e8f0;padding:24px">
+  <h3 style="margin:0 0 16px;font-size:1.1rem;font-weight:700">📊 Feature Priority Matrix</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+    <thead>
+      <tr style="background:#f8fafc">
+        <th style="padding:10px;text-align:left;border:1px solid #e2e8f0">Feature</th>
+        <th style="padding:10px;text-align:center;border:1px solid #e2e8f0">Effort</th>
+        <th style="padding:10px;text-align:center;border:1px solid #e2e8f0">Value</th>
+        <th style="padding:10px;text-align:center;border:1px solid #e2e8f0">User Impact</th>
+        <th style="padding:10px;text-align:center;border:1px solid #e2e8f0">Demo Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Loading Skeletons</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">2h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#dc2626;font-weight:600">High</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Better UX</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Toast Notifications</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">1h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#dc2626;font-weight:600">High</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Feedback</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Price Badges</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">1h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#dc2626;font-weight:600">High</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Visual clarity</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Comparison Table</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">3h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#dc2626;font-weight:600">High</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Easy comparison</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Progress Indicators</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">30m</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#d97706;font-weight:600">Med</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Transparency</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Flip Cards</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">4h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#d97706;font-weight:600">Med</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Engagement</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Filter/Sort</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">3h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#d97706;font-weight:600">Med</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Control</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Price History</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">4h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#7c3aed;font-weight:600">Low</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Insights</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td style="padding:10px;border:1px solid #e2e8f0;font-weight:600">Dark Mode</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">2h</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center"><span style="color:#7c3aed;font-weight:600">Low</span></td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">Preference</td>
+        <td style="padding:10px;border:1px solid #e2e8f0;text-align:center">⭐⭐</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:16px;padding:12px;background:#f0fdf4;border-left:4px solid #16a34a;border-radius:4px">
+    <strong style="color:#166534">🚀 Quick Wins (4 hours total):</strong>
+    <span style="color:#15803d"> Loading skeletons (2h) + Toast notifications (1h) + Price badges (1h) = Significantly better UX</span>
+  </div>
 </div>
 
 <!-- ──────────────────────────────────────────── QUICK REFERENCE -->

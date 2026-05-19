@@ -5,9 +5,9 @@ import Link from "next/link";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
 export const metadata: Metadata = {
-  title: "CopilotKit POC – Multi-Domain Assistant",
+  title: "CopilotKit POC",
   description:
-    "CopilotKit + LangGraph + FastAPI + SQLite demo across Finance, HR, Healthcare, and Wireless.",
+    "CopilotKit POC - proof of concept app",
 };
 
 const NAV = [
@@ -22,6 +22,7 @@ const NAV = [
   { href: "/multimodal",  label: "Vision" },
   { href: "/voice",       label: "Voice" },
   { href: "/external-api", label: "🌤️ Weather External API" },
+  { href: "/carrier-comparison", label: "📱 MCP Apps - Carrier Comparison" },
 ];
 
 export default function RootLayout({
@@ -34,10 +35,10 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         <ClientLayoutWrapper>
           <header className="border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-20">
-            <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
+            <div className="flex items-center gap-6 px-6 py-3">
+              <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
                 <span className="text-2xl">🪁</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   CopilotKit POC
                 </span>
               </Link>

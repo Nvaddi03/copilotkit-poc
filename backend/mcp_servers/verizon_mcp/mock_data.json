@@ -1,0 +1,315 @@
+{
+  "devices": [
+    {
+      "id": "iphone-17-pro",
+      "name": "iPhone 17 Pro",
+      "brand": "Apple",
+      "carrier": "Verizon",
+      "price_full": 1099,
+      "price_monthly": 30.55,
+      "storage_options": ["256GB", "512GB", "1TB"],
+      "storage_prices": {
+        "256GB": 30.55,
+        "512GB": 36.11,
+        "1TB": 41.66
+      },
+      "colors": [
+        "Titanium Gray",
+        "Titanium Blue",
+        "Titanium White",
+        "Titanium Black"
+      ],
+      "image_url": "https://ss7.vzw.com/is/image/VerizonWireless/apple-iphone-17-pro-titanium-gray",
+      "features": [
+        "A19 Pro chip with 8-core GPU",
+        "Advanced Pro camera system (48MP Main, 48MP Ultra Wide, 12MP Telephoto)",
+        "Enhanced titanium design - 15% lighter",
+        "Customizable Action button",
+        "Always-On display with ProMotion",
+        "Emergency SOS via satellite",
+        "Enhanced AI capabilities"
+      ],
+      "specs": {
+        "display": "6.3-inch Super Retina XDR",
+        "display_tech": "ProMotion technology with adaptive refresh rates up to 120Hz",
+        "camera": "48MP Main | 48MP Ultra Wide | 12MP Periscope Telephoto (5x optical zoom)",
+        "video": "8K Dolby Vision up to 30 fps, 4K up to 120 fps",
+        "battery": "Up to 27 hours video playback",
+        "chip": "A19 Pro chip",
+        "storage": "256GB, 512GB, 1TB",
+        "durability": "Ceramic Shield front, Textured matte glass back, Titanium design",
+        "water_resistance": "IP69 (enhanced water and dust resistance)",
+        "5g": "5G Ultra Wideband"
+      },
+      "promotions": [
+        {
+          "id": "promo-trade-in-17",
+          "title": "Trade-in Savings",
+          "description": "Get up to $1,200 off with eligible trade-in",
+          "discount": 1200,
+          "conditions": ["Select Unlimited plans", "Eligible trade-in device"]
+        },
+        {
+          "id": "promo-new-line-17",
+          "title": "New Line Offer",
+          "description": "$600 off when you add a new line",
+          "discount": 600,
+          "conditions": ["New line activation", "Unlimited Plus or Premium plan"]
+        }
+      ]
+    },
+    {
+      "id": "iphone-17",
+      "name": "iPhone 17",
+      "brand": "Apple",
+      "carrier": "Verizon",
+      "price_full": 899,
+      "price_monthly": 24.99,
+      "storage_options": ["128GB", "256GB", "512GB"],
+      "storage_prices": {
+        "128GB": 24.99,
+        "256GB": 27.77,
+        "512GB": 33.33
+      },
+      "colors": [
+        "Midnight",
+        "Starlight",
+        "Blue",
+        "Pink",
+        "Green"
+      ],
+      "image_url": "https://ss7.vzw.com/is/image/VerizonWireless/apple-iphone-17-midnight",
+      "features": [
+        "A19 chip with 6-core GPU",
+        "Dual camera system (48MP Main, 12MP Ultra Wide)",
+        "Aerospace-grade aluminum design",
+        "Dynamic Island",
+        "All-day battery life",
+        "Emergency SOS via satellite"
+      ],
+      "specs": {
+        "display": "6.1-inch Super Retina XDR",
+        "camera": "48MP Main | 12MP Ultra Wide",
+        "video": "4K Dolby Vision up to 60 fps",
+        "battery": "Up to 22 hours video playback",
+        "chip": "A19 chip",
+        "storage": "128GB, 256GB, 512GB",
+        "durability": "Ceramic Shield front, Glass back, Aluminum design",
+        "water_resistance": "IP68",
+        "5g": "5G Ultra Wideband"
+      },
+      "promotions": [
+        {
+          "id": "promo-trade-in-17-std",
+          "title": "Trade-in Savings",
+          "description": "Get up to $800 off with eligible trade-in",
+          "discount": 800,
+          "conditions": ["Select Unlimited plans", "Eligible trade-in device"]
+        }
+      ]
+    },
+    {
+      "id": "iphone-15-pro",
+      "name": "iPhone 15 Pro",
+      "brand": "Apple",
+      "carrier": "Verizon",
+      "price_full": 999,
+      "price_monthly": 27.77,
+      "storage_options": ["128GB", "256GB", "512GB", "1TB"],
+      "storage_prices": {
+        "128GB": 27.77,
+        "256GB": 30.55,
+        "512GB": 36.11,
+        "1TB": 41.66
+      },
+      "colors": [
+        "Natural Titanium",
+        "Blue Titanium",
+        "White Titanium",
+        "Black Titanium"
+      ],
+      "image_url": "https://ss7.vzw.com/is/image/VerizonWireless/apple-iphone-15-pro-natural-titanium",
+      "features": [
+        "A17 Pro chip with 6-core GPU",
+        "Pro camera system (48MP Main, 12MP Ultra Wide, 12MP Telephoto)",
+        "Titanium design - strong and light",
+        "Action button for quick controls",
+        "Always-On display",
+        "Emergency SOS via satellite"
+      ],
+      "specs": {
+        "display": "6.1-inch Super Retina XDR",
+        "display_tech": "ProMotion technology with adaptive refresh rates up to 120Hz",
+        "camera": "48MP Main | 12MP Ultra Wide | 12MP Telephoto (3x optical zoom)",
+        "video": "4K Dolby Vision up to 60 fps",
+        "battery": "Up to 23 hours video playback",
+        "chip": "A17 Pro chip",
+        "storage": "128GB, 256GB, 512GB, 1TB",
+        "durability": "Ceramic Shield front, Textured matte glass back, Titanium design",
+        "water_resistance": "IP68 (maximum depth of 6 meters up to 30 minutes)",
+        "5g": "5G Ultra Wideband"
+      },
+      "promotions": [
+        {
+          "id": "promo-trade-in",
+          "title": "Trade-in Savings",
+          "description": "Get up to $1,000 off with eligible trade-in",
+          "discount": 1000,
+          "conditions": ["Select Unlimited plans", "Eligible trade-in device"]
+        },
+        {
+          "id": "promo-new-line",
+          "title": "New Line Offer",
+          "description": "$500 off when you add a new line",
+          "discount": 500,
+          "conditions": ["New line activation", "Unlimited Plus or Premium plan"]
+        }
+      ]
+    },
+    {
+      "id": "samsung-galaxy-s24",
+      "name": "Samsung Galaxy S24",
+      "brand": "Samsung",
+      "carrier": "Verizon",
+      "price_full": 799,
+      "price_monthly": 22.22,
+      "storage_options": ["128GB", "256GB"],
+      "storage_prices": {
+        "128GB": 22.22,
+        "256GB": 25.00
+      },
+      "colors": [
+        "Onyx Black",
+        "Marble Gray",
+        "Cobalt Violet",
+        "Amber Yellow"
+      ],
+      "image_url": "https://ss7.vzw.com/is/image/VerizonWireless/samsung-galaxy-s24-onyx-black",
+      "features": [
+        "Galaxy AI features",
+        "50MP camera with Nightography",
+        "Vision Booster display",
+        "All-day battery",
+        "Corning Gorilla Glass Victus 2"
+      ],
+      "specs": {
+        "display": "6.2-inch FHD+ Dynamic AMOLED 2X",
+        "camera": "50MP Wide | 12MP Ultra Wide | 10MP Telephoto (3x optical zoom)",
+        "battery": "4,000mAh",
+        "chip": "Qualcomm Snapdragon 8 Gen 3",
+        "storage": "128GB, 256GB",
+        "5g": "5G Ultra Wideband"
+      }
+    }
+  ],
+  "plans": [
+    {
+      "id": "unlimited-welcome",
+      "name": "Unlimited Welcome",
+      "description": "Our most affordable unlimited plan",
+      "price_per_line": {
+        "1": 65,
+        "2": 55,
+        "3": 40,
+        "4": 35,
+        "5": 30
+      },
+      "data": "Unlimited 5G / 4G LTE",
+      "speed": "5G Nationwide",
+      "hotspot": "None",
+      "streaming": "480p SD quality",
+      "international": "Talk, Text & Data to Mexico & Canada",
+      "features": [
+        "Unlimited talk, text & data",
+        "5G Nationwide access",
+        "Mobile Hotspot not included",
+        "SD quality streaming"
+      ]
+    },
+    {
+      "id": "unlimited-plus",
+      "name": "Unlimited Plus",
+      "description": "Premium unlimited with extras",
+      "price_per_line": {
+        "1": 80,
+        "2": 70,
+        "3": 55,
+        "4": 50,
+        "5": 45
+      },
+      "data": "Unlimited Premium 5G / 4G LTE",
+      "speed": "5G Ultra Wideband",
+      "hotspot": "30GB",
+      "streaming": "720p HD quality",
+      "international": "Talk, Text & Data to Mexico & Canada + TravelPass",
+      "perks": [
+        "Disney Bundle (Disney+, Hulu, ESPN+)",
+        "Apple Arcade or Google Play Pass (6 months)",
+        "Apple Music (6 months)"
+      ],
+      "features": [
+        "Unlimited Premium data",
+        "5G Ultra Wideband access",
+        "30GB Mobile Hotspot",
+        "HD quality streaming",
+        "International benefits"
+      ]
+    },
+    {
+      "id": "unlimited-ultimate",
+      "name": "Unlimited Ultimate",
+      "description": "Our best unlimited plan",
+      "price_per_line": {
+        "1": 90,
+        "2": 80,
+        "3": 65,
+        "4": 60,
+        "5": 55
+      },
+      "data": "Unlimited Premium 5G / 4G LTE",
+      "speed": "5G Ultra Wideband",
+      "hotspot": "60GB",
+      "streaming": "4K UHD quality",
+      "international": "Talk, Text & Data to Mexico & Canada + TravelPass + International calling",
+      "perks": [
+        "Disney Bundle (Disney+, Hulu, ESPN+)",
+        "Apple One (included)",
+        "Apple Music Family (included)",
+        "Walmart+ membership"
+      ],
+      "features": [
+        "Unlimited Premium data",
+        "5G Ultra Wideband access",
+        "60GB Mobile Hotspot",
+        "4K UHD quality streaming",
+        "Premium international benefits",
+        "100GB Cloud storage"
+      ]
+    }
+  ],
+  "promotions": [
+    {
+      "id": "byod-discount",
+      "name": "Bring Your Own Device",
+      "description": "Get $540 when you bring your own phone",
+      "discount": 540,
+      "duration_months": 36,
+      "conditions": [
+        "Port in from another carrier",
+        "Select Unlimited plan",
+        "Keep service for 36 months"
+      ]
+    },
+    {
+      "id": "family-discount",
+      "name": "Multi-Line Discount",
+      "description": "Save more with additional lines",
+      "discount_type": "percentage",
+      "savings": "Up to $50/month per line",
+      "conditions": [
+        "4 or more lines",
+        "Unlimited plans"
+      ]
+    }
+  ]
+}

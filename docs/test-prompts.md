@@ -261,7 +261,50 @@ Organised by page → category → sample prompts. Copy/paste into the relevant 
 
 ---
 
-## 11. Negative / Guard-rail Checks
+## 11. MCP Carrier Apps · `http://localhost:3000/carrier-comparison`
+
+**UI Component:** `CopilotChat` (inline, split-panel design)  
+**CopilotKit Primitives:** MCP (Model Context Protocol) servers, `useCopilotAction` for UI rendering, `useCopilotReadable`  
+**MCP Servers:** `verizon-mcp` (port 8001), `att-mcp` (port 8002), `tmobile-mcp` (port 8003)  
+**Registered actions:** `renderDeviceInfo`, `renderPlanInfo`, `renderCarrierComparison`
+
+### 11.1 Single Carrier Device Queries
+- `Show me iPhone 15 Pro on Verizon`
+- `What's the price of Samsung Galaxy S24 on AT&T?`
+- `Get me T-Mobile's iPhone 15 pricing`
+- `Show me Galaxy Z Fold 5 on Verizon`
+
+### 11.2 Plan Queries
+- `What are AT&T's unlimited plans for 2 lines?`
+- `Show me Verizon's family plans`
+- `T-Mobile prepaid plans for 1 line`
+- `What are AT&T's business plans?`
+
+### 11.3 Multi-Carrier Comparison
+- `Compare iPhone 15 Pro prices across all carriers`
+- `Which carrier has the best deal on Galaxy S24?`
+- `Show me Verizon vs AT&T vs T-Mobile for iPhone 15`
+- `Compare Samsung Galaxy S24 prices`
+
+### 11.4 Intent Classification Verification
+- `I want to buy an iPhone` → should ask which carrier/model
+- `What's the cheapest carrier for iPhone 15?` → should trigger comparison
+- `Tell me about T-Mobile` → should provide carrier info
+
+### 11.5 UI Rendering Verification
+- After any device query → verify left panel shows carrier-branded card (🔴🔵🟣)
+- After any plan query → verify left panel shows plan details with features
+- After comparison query → verify left panel shows side-by-side table with "🏆 Best Price" indicator
+
+### 11.6 Week 3 Queries (Coming Soon)
+- `Show me all Samsung tablets` ⏳
+- `Compare iPad vs Galaxy Tab` ⏳
+- `What fiber speeds does AT&T offer?` ⏳
+- `Bundle 2 lines + 1Gbps internet` ⏳
+
+---
+
+## 12. Negative / Guard-rail Checks
 
 Use these on **any page** to confirm the agent never falls back to "I can't render":
 
@@ -272,7 +315,7 @@ Use these on **any page** to confirm the agent never falls back to "I can't rend
 
 ---
 
-## 12. CopilotKit Primitives Coverage
+## 13. CopilotKit Primitives Coverage
 
 | Primitive | Pages | Key Prompt |
 |---|---|---|
@@ -280,12 +323,12 @@ Use these on **any page** to confirm the agent never falls back to "I can't rend
 | `CopilotProvider` (client wrapper) | all | *(layout-level)* |
 | `CopilotSidebar` | dashboard, hitl | any §1 prompt |
 | `CopilotPopup` | controlled, declarative | any §2 or §3 prompt |
-| `CopilotChat` (inline) | open, chat, multiagent, rag, multimodal, voice | any §4–§10 prompt |
+| `CopilotChat` (inline) | open, chat, multiagent, rag, multimodal, voice, carrier-comparison | any §4–§11 prompt |
 | `CopilotTextarea` | open | §4.3 |
 | `CopilotDevConsole` | all (dev only) | open DevConsole panel |
-| `useCopilotReadable` + `parentId` | dashboard, rag | §1.1, §8.2 |
+| `useCopilotReadable` + `parentId` | dashboard, rag, carrier-comparison | §1.1, §8.2, §11.4 |
 | `useCopilotReadable` + `available` flag | rag | §8.3 |
-| `useCopilotAction` · handler | dashboard, controlled, hitl | §1, §2, §5 |
+| `useCopilotAction` · handler | dashboard, controlled, hitl, carrier-comparison | §1, §2, §5, §11 |
 | `useCopilotAction` · `render` prop (L3) | controlled | §2.1 |
 | `useCopilotAction` · `renderAndWait` (HITL) | hitl | §5 |
 | `useCopilotAction` · streaming `render` (L2) | open | §4.1 |
@@ -297,5 +340,9 @@ Use these on **any page** to confirm the agent never falls back to "I can't rend
 | RAG + FAISS vector search | rag | §8 |
 | Multimodal image (GPT-4o vision) | multimodal | §9 |
 | Browser STT + TTS (voice) | voice | §10 |
+| MCP (Model Context Protocol) servers | carrier-comparison | §11 |
 | Backend `@tool` (LangGraph) | all | §1.1 |
-| AG-UI HTTP streaming transport | all | *(transport layer)* |
+| CopilotKit Runtime (not AG-UI) | all | *(transport layer - connects LangGraph agents)* |
+| MCP (Model Context Protocol) servers | carrier-comparison | §11 (3 FastAPI servers on ports 8001-8003) |
+
+

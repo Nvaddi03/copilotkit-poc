@@ -61,6 +61,7 @@
     <a href="#l1">L1 · Chat</a>
     <a href="#l2">L2 · Tools/Actions</a>
     <a href="#l3">L3 · Controlled GenUI</a>
+    <a href="#html-ui">🎨 HTML/UI Features</a>
     <a href="#l4">L4 · Declarative GenUI</a>
     <a href="#l5">L5 · Open GenUI</a>
     <a href="#hooks">React hooks</a>
@@ -209,8 +210,161 @@ def summarize_table(table: str) -&gt; dict: ...</pre>
 </section>
 
 <!-- ============================================================ -->
+<section id="html-ui">
+<h2>🎨 HTML/UI Features & Enhancements</h2>
+<p class="desc" style="max-width:900px;margin-bottom:16px">Practical UI improvements from CopilotKit tutorials to enhance the carrier comparison experience:</p>
+
+<h3 style="margin-top:18px">Quick Wins (< 2 hours each)</h3>
+<div class="grid">
+  <div class="card">
+    <div class="row"><span class="pill tag-ok">✅ 2h</span><h3>Loading Skeletons</h3></div>
+    <p class="desc">Animated placeholders during scraping to prevent blank screens</p>
+<pre>&lt;div className="animate-pulse space-y-4"&gt;
+  &lt;div className="h-4 bg-gray-200 rounded w-3/4"&gt;&lt;/div&gt;
+  &lt;div className="h-8 bg-gray-200 rounded"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    <p style="font-size:12px;margin-top:8px">Shows "Scraping Verizon.com..." with pulsing animation</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-ok">✅ 1h</span><h3>Toast Notifications</h3></div>
+    <p class="desc">Success/error messages for scraping operations</p>
+<pre>toast.success('Found iPhone 17 Pro pricing', {
+  duration: 3000,
+  icon: '✓'
+});
+toast.loading('Scraping carrier websites...');</pre>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-ok">✅ 1h</span><h3>Price Badges</h3></div>
+    <p class="desc">Visual indicators for best deals</p>
+<pre>&lt;span className="badge bg-green-100"&gt;
+  🏆 Best Deal
+&lt;/span&gt;
+&lt;span className="badge bg-blue-100"&gt;
+  💰 Trade-in Available
+&lt;/span&gt;</pre>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-ok">✅ 30m</span><h3>Progress Indicators</h3></div>
+    <p class="desc">Show scraping progress for multi-carrier queries</p>
+<pre>&lt;Spinner /&gt; Verizon ✓
+&lt;Spinner /&gt; AT&T ...
+&lt;Spinner /&gt; T-Mobile ...</pre>
+  </div>
+</div>
+
+<h3 style="margin-top:24px">High-Value Features (3-4 hours each)</h3>
+<div class="grid">
+  <div class="card">
+    <div class="row"><span class="pill tag-warn">⚠️ 3h</span><h3>Comparison Table</h3></div>
+    <p class="desc">Sticky header side-by-side pricing table</p>
+<pre>&lt;table className="sticky-header"&gt;
+  &lt;thead&gt;&lt;tr&gt;
+    &lt;th&gt;Feature&lt;/th&gt;
+    &lt;th&gt;Verizon&lt;/th&gt;
+    &lt;th&gt;AT&amp;T&lt;/th&gt;
+    &lt;th&gt;T-Mobile&lt;/th&gt;
+  &lt;/tr&gt;&lt;/thead&gt;
+  ...
+&lt;/table&gt;</pre>
+    <span class="pill">⭐⭐⭐⭐⭐ Demo Impact</span>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-warn">⚠️ 4h</span><h3>Interactive Flip Cards</h3></div>
+    <p class="desc">Front: pricing summary / Back: features + CTA</p>
+<pre>&lt;div className="flip-card"&gt;
+  &lt;div className="flip-card-front"&gt;
+    {price}
+  &lt;/div&gt;
+  &lt;div className="flip-card-back"&gt;
+    {features}
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    <span class="pill">⭐⭐⭐⭐ Engagement</span>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-warn">⚠️ 3h</span><h3>Filter & Sort Controls</h3></div>
+    <p class="desc">Interactive controls above comparison results</p>
+<pre>&lt;select value={sortBy}&gt;
+  &lt;option&gt;Price: Low to High&lt;/option&gt;
+  &lt;option&gt;Carrier: A-Z&lt;/option&gt;
+&lt;/select&gt;
+&lt;button&gt;Trade-in Only&lt;/button&gt;</pre>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill tag-warn">⚠️ 4h</span><h3>Price History Chart</h3></div>
+    <p class="desc">Line graph showing price trends over time</p>
+<pre>&lt;LineChart data={priceHistory}&gt;
+  &lt;Line dataKey="verizon" /&gt;
+  &lt;Line dataKey="att" /&gt;
+  &lt;Line dataKey="tmobile" /&gt;
+&lt;/LineChart&gt;</pre>
+    <span class="pill">⭐⭐⭐⭐ Insights</span>
+  </div>
+</div>
+
+<h3 style="margin-top:24px">Polish Features (2 hours each)</h3>
+<div class="grid">
+  <div class="card">
+    <div class="row"><span class="pill">🟡 2h</span><h3>Collapsible Feature Lists</h3></div>
+    <p class="desc">Collapse long lists with "Show more" button</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill">🟡 2h</span><h3>Responsive Grid</h3></div>
+    <p class="desc">3-column → 1-column layout for mobile</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill">🟡 30m</span><h3>Copy to Clipboard</h3></div>
+    <p class="desc">Share pricing comparison results</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="pill">🟡 2h</span><h3>Dark Mode Toggle</h3></div>
+    <p class="desc">Theme switcher for better UX</p>
+  </div>
+</div>
+
+<h3 style="margin-top:24px">Feature Priority Matrix</h3>
+<table style="font-size:13px">
+<thead><tr><th>Feature</th><th>Effort</th><th>Value</th><th>User Impact</th><th>Demo Impact</th></tr></thead>
+<tbody>
+<tr><td>Loading Skeletons</td><td>2h</td><td class="tag-ok">🔴 High</td><td>Better UX</td><td>⭐⭐⭐</td></tr>
+<tr><td>Toast Notifications</td><td>1h</td><td class="tag-ok">🔴 High</td><td>Feedback</td><td>⭐⭐⭐</td></tr>
+<tr><td>Price Badges</td><td>1h</td><td class="tag-ok">🔴 High</td><td>Visual clarity</td><td>⭐⭐⭐⭐</td></tr>
+<tr><td>Comparison Table</td><td>3h</td><td class="tag-ok">🔴 High</td><td>Easy comparison</td><td class="tag-ok">⭐⭐⭐⭐⭐</td></tr>
+<tr><td>Progress Indicators</td><td>30m</td><td class="tag-warn">🟢 Med</td><td>Transparency</td><td>⭐⭐⭐</td></tr>
+<tr><td>Flip Cards</td><td>4h</td><td class="tag-warn">🟢 Med</td><td>Engagement</td><td>⭐⭐⭐⭐</td></tr>
+<tr><td>Filter/Sort</td><td>3h</td><td class="tag-warn">🟢 Med</td><td>Control</td><td>⭐⭐⭐</td></tr>
+<tr><td>Price History</td><td>4h</td><td>🟡 Low</td><td>Insights</td><td>⭐⭐⭐⭐</td></tr>
+<tr><td>Responsive Grid</td><td>2h</td><td class="tag-warn">🟢 Med</td><td>Mobile UX</td><td>⭐⭐</td></tr>
+<tr><td>Dark Mode</td><td>2h</td><td>🟡 Low</td><td>Preference</td><td>⭐⭐</td></tr>
+</tbody>
+</table>
+
+<div class="card" style="margin-top:16px;background:#0e1530">
+  <h3>🚀 Recommended Implementation Order</h3>
+  <p class="desc">4-day sprint to polish carrier comparison UI:</p>
+  <ul style="font-size:13px">
+    <li><strong>Day 1 (4h):</strong> Loading skeletons + Toast notifications + Price badges</li>
+    <li><strong>Day 2 (6h):</strong> Comparison table + Filter/Sort controls</li>
+    <li><strong>Day 3 (6h):</strong> Responsive grid + Flip cards</li>
+    <li><strong>Day 4 (8h):</strong> Price history + Collapsible lists + Dark mode</li>
+  </ul>
+  <p style="font-size:12px;color:var(--muted);margin-top:8px">Total: ~24 hours for significantly better UX & demo impact</p>
+</div>
+</section>
+
+<!-- ============================================================ -->
 <section id="l4">
-<h2>L4 · Declarative Generative UI (A2UI catalog)</h2>
+<h2>L4 · Declarative Generative UI (A2UI catalog) <span class="tag-warn">⚠️ NEEDS A2UI IMPLEMENTATION</span></h2>
 <div class="grid">
   <div class="card">
     <h3>Idea</h3>
@@ -222,7 +376,7 @@ def summarize_table(table: str) -&gt; dict: ...</pre>
 });</pre>
   </div>
   <div class="card">
-    <h3>Catalog</h3>
+    <h3>Catalog (Current - Basic)</h3>
     <ul>
       <li><code>Stat</code> · label + big value</li>
       <li><code>Pie</code> · title + <code>{name,value}[]</code></li>
@@ -231,12 +385,47 @@ def summarize_table(table: str) -&gt; dict: ...</pre>
     </ul>
   </div>
   <div class="card">
-    <h3>Try it</h3>
+    <h3>🎯 A2UI Upgrade Plan</h3>
+    <p class="desc tag-warn">Implement Google A2UI spec with component catalog system:</p>
+    <ul style="font-size:12.5px">
+      <li>✅ Create <code>definitions.ts</code> (20+ components)</li>
+      <li>✅ Create <code>renderers.tsx</code> (React implementations)</li>
+      <li>✅ Add <code>CopilotKitMiddleware()</code> in backend</li>
+      <li>✅ Enable <code>a2ui: { catalog }</code> in runtime</li>
+      <li>✅ Agent generates dynamic schemas</li>
+    </ul>
+    <p style="margin-top:8px;font-size:12px;color:var(--muted)">Estimated effort: 2-3 days | High value for dashboard building</p>
+  </div>
+  <div class="card">
+    <h3>Try it (Current)</h3>
     <ul>
-      <li>“Build a finance dashboard”</li>
-      <li>“Summarize wireless usage with stats and a callout”</li>
+      <li>"Build a finance dashboard"</li>
+      <li>"Summarize wireless usage with stats and a callout"</li>
     </ul>
     <a class="demo-link" href="http://localhost:3000/declarative">▶ Open L4 demo</a>
+  </div>
+  <div class="card">
+    <h3>A2UI Component Catalog (Planned)</h3>
+    <p class="desc">Full catalog for dynamic dashboard generation:</p>
+    <ul style="font-size:12.5px">
+      <li><code>Card</code>, <code>DashboardCard</code> · containers</li>
+      <li><code>Metric</code>, <code>Stat</code> · KPI displays</li>
+      <li><code>PieChart</code>, <code>BarChart</code> · visualizations</li>
+      <li><code>Row</code>, <code>Column</code> · layouts</li>
+      <li><code>Text</code>, <code>Title</code> · typography</li>
+      <li><code>Badge</code>, <code>Button</code> · interactive</li>
+      <li><code>DataTable</code>, <code>List</code> · data display</li>
+      <li><code>Tabs</code>, <code>Divider</code> · structure</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Resources</h3>
+    <ul style="font-size:12.5px">
+      <li><a href="https://a2ui.org/" target="_blank">A2UI Spec</a> (Google + CopilotKit)</li>
+      <li><a href="https://a2ui-editor.ag-ui.com/" target="_blank">A2UI Composer</a> (Visual tool)</li>
+      <li><a href="../CopilotKitTutorials/L4.ipynb">L4 Tutorial</a> (Cells 75-350)</li>
+      <li><a href="TUTORIAL_COMPARISON_NOTES.md#l4-declarative-generative-ui">Tutorial Comparison Notes</a></li>
+    </ul>
   </div>
 </div>
 </section>

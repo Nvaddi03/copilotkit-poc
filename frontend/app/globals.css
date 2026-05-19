@@ -12,3 +12,31 @@ body {
   background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
   color: #0f172a;
 }
+
+/* Custom Chat Page - Hide default CopilotKit message bubbles */
+.custom-chat-container [class*="Message_userMessage"],
+.custom-chat-container [class*="Message_assistantMessage"] {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.custom-chat-container [class*="Message_userMessage"] > div:first-child,
+.custom-chat-container [class*="Message_assistantMessage"] > div:first-child {
+  display: none !important;
+}
+
+/* Ensure CopilotChat has proper height and scrolling */
+.custom-chat-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-chat-container > div {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+

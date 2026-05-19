@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verizon Plans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-transparent p-0 m-0">
+    <!-- 
+        MCP App: Verizon Plans Table
+        =============================
+        Auto-rendered by CopilotKit when get_plans() is called
+    -->
+    
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🔴</span>
+                    <div>
+                        <h2 class="font-bold text-xl">Verizon Unlimited Plans</h2>
+                        <p class="text-sm text-red-100">For <span id="num-lines">1</span> line(s)</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-red-100">Per line pricing</div>
+                    <div class="text-2xl font-bold">$<span id="min-price">65</span>/mo</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Plans Grid -->
+        <div id="plans-container" class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200">
+            <!-- Plans will be dynamically generated -->
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-4 border-t">
+            <p class="text-xs text-gray-500 text-center">
+                Prices shown are per line. Taxes and fees not included. Auto-pay and paperless billing required.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Get data from MCP
+        const plansData = window.mcpData || {
+            plans: [
+                {
+                    name: "Unlimited Welcome",
+                    price: 65,
+                    data: "Unlimited 5G / 4G LTE",
+                    hotspot: "None",
+                    streaming: "480p SD"
+                }
+            ],
+            lines: 1,
+            carrier: "Verizon"
+        };
+
+        console.log("📋 Rendering Verizon Plans:", plansData);
+
+        // Update header
+        document.getElementById('num-lines').textContent = plansData.lines;
+        const minPrice = Math.min(...plansData.plans.map(p => p.price));
+        document.getElementById('min-price').textContent = minPrice;
+
+        // Render plans
+        const container = document.getElementById('plans-container');
+        
+        plansData.plans.forEach((plan, idx) => {
+            const isPopular = idx === 1; // Middle plan is usually most popular
+            
+            const planCard = document.createElement('div');
+            planCard.className = `bg-white p-6 relative ${isPopular ? 'ring-2 ring-red-600' : ''}`;
+            
+            planCard.innerHTML = `
+                ${isPopular ? '<div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</div>' : ''}
+                
+                <div class="text-center mb-4">
+                    <h3 class="font-bold text-lg mb-1">${plan.name}</h3>
+                    <div class="text-3xl font-bold text-red-600 mb-1">
+                        $${plan.price}<span class="text-base text-gray-500">/mo</span>
+                    </div>
+                    <div class="text-xs text-gray-500">per line</div>
+                </div>
+                
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-start gap-2 text-sm">
+                        <span class="text-green-600 mt-0.5">✓</span>
+                        <span><strong>Data:</strong> ${plan.data}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm">
+                        <span class="text-green-600 mt-0.5">✓</span>
+                        <span><strong>Hotspot:</strong> ${plan.hotspot}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm">
+                        <span class="text-green-600 mt-0.5">✓</span>
+                        <span><strong>Streaming:</strong> ${plan.streaming}</span>
+                    </div>
+                    ${plan.perks ? plan.perks.slice(0, 2).map(perk => `
+                        <div class="flex items-start gap-2 text-sm text-red-600">
+                            <span class="mt-0.5">⭐</span>
+                            <span>${perk}</span>
+                        </div>
+                    `).join('') : ''}
+                </div>
+                
+                <button 
+                    onclick="selectPlan('${plan.id}')" 
+                    class="${isPopular ? 'bg-red-600 hover:bg-red-700 text-white' : 'border-2 border-red-600 text-red-600 hover:bg-red-50'} w-full py-2 rounded-lg font-medium transition"
+                >
+                    Select Plan
+                </button>
+            `;
+            
+            container.appendChild(planCard);
+        });
+
+        function selectPlan(planId) {
+            console.log('Selected plan:', planId);
+            alert(`Selected plan: ${planId}\n\nIn production, this would add to cart or trigger plan comparison.`);
+        }
+    </script>
+</body>
+</html>

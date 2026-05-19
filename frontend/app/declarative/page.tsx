@@ -354,6 +354,7 @@ export default function DeclarativePage() {
       </div>
 
       <CopilotPopup
+        key="declarative-genui-page"
         defaultOpen
         instructions={`You are an enterprise data analyst AI. Your ONLY job is to call data tools then call buildDashboard.
 

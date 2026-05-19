@@ -1,6 +1,6 @@
 "use client";
 
-import { CopilotChat, AssistantMessage, UserMessage, useChatContext } from "@copilotkit/react-ui";
+import { CopilotChat, useChatContext } from "@copilotkit/react-ui";
 import {
   useCopilotMessagesContext,
   useLazyToolRenderer,
@@ -129,57 +129,85 @@ export default function ChatPage() {
   void lazyRender; // prevent unused-variable lint — available for advanced usage
 
   return (
-    <div className="space-y-4">
-      <header>
-        <h1 className="text-2xl font-bold">CopilotChat · Custom Renderers</h1>
-        <p className="text-slate-600 mt-1 max-w-3xl">
-          Demonstrates <code>CopilotChat</code> with custom <code>AssistantMessage</code> / <code>UserMessage</code> render props,{" "}
-          <code>useChatContext</code>, <code>useRenderToolCall</code>,{" "}
-          <code>useLazyToolRenderer</code>, and <code>useCopilotMessagesContext</code>.
-        </p>
-      </header>
+    <div className="space-y-4 max-w-7xl mx-auto px-4 py-4">
+      <div className="space-y-4">
+        <header>
+          <h1 className="text-2xl font-bold">CopilotChat · Custom Renderers</h1>
+          <p className="text-slate-600 mt-1 max-w-3xl">
+            Demonstrates <code>CopilotChat</code> with custom <code>AssistantMessage</code> / <code>UserMessage</code> render props,{" "}
+            <code>useChatContext</code>, <code>useRenderToolCall</code>,{" "}
+            <code>useLazyToolRenderer</code>, and <code>useCopilotMessagesContext</code>.
+          </p>
+        </header>
 
-      <div className="flex gap-2 flex-wrap items-center">
-        {["finance", "hr", "healthcare", "wireless"].map((d) => (
-          <button
-            key={d}
-            onClick={() => setActiveDomain(d)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
-              activeDomain === d
-                ? "bg-indigo-600 text-white border-indigo-600"
-                : "bg-white text-slate-600 border-slate-300 hover:border-indigo-400"
-            }`}
-          >
-            {d}
-          </button>
-        ))}
-        <span className="text-xs text-slate-400 ml-1">(changes suggestions via useCopilotChatSuggestions)</span>
+        <div className="flex gap-2 flex-wrap items-center">
+          {["finance", "hr", "healthcare", "wireless"].map((d) => (
+            <button
+              key={d}
+              onClick={() => setActiveDomain(d)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
+                activeDomain === d
+                  ? "bg-indigo-600 text-white border-indigo-600"
+                  : "bg-white text-slate-600 border-slate-300 hover:border-indigo-400"
+              }`}
+            >
+              {d}
+            </button>
+          ))}
+          <span className="text-xs text-slate-400 ml-1">(changes suggestions via useCopilotChatSuggestions)</span>
+        </div>
       </div>
 
-      {/* CopilotChat renders ChatContextPanel + MessageStats as children inside its context */}
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden" style={{ height: "60vh" }}>
+      {/* CopilotChat with fixed height */}
+      <div className="rounded-xl border border-slate-200 bg-white custom-chat-container overflow-hidden" style={{ height: "calc(100vh - 350px)", minHeight: "500px", maxHeight: "700px" }}>
         <CopilotChat
           instructions={`You are a multi-domain data assistant. Active domain: ${activeDomain}. Use tools to fetch real data.`}
           labels={{
             title: "Custom Chat View",
             initial: `Hi! I'm using custom message renderers + useChatContext. Ask me about ${activeDomain} data!`,
           }}
-          AssistantMessage={(props) => (
-            <div className="flex items-start gap-2 my-1">
-              <span className="text-lg mt-0.5">🤖</span>
-              <div className="rounded-xl rounded-tl-none bg-purple-50 border border-purple-100 px-3 py-2 text-sm text-slate-800 max-w-[85%]">
-                <AssistantMessage {...props} />
+          AssistantMessage={(props) => {
+            let content = '';
+            if (typeof props.message.content === 'string') {
+              content = props.message.content;
+            } else if (Array.isArray(props.message.content)) {
+              const textPart = (props.message.content as any[]).find((c: any) => c.type === 'text');
+              content = (textPart as any)?.text || '';
+            }
+            
+            // Only render if we have content
+            if (!content) return null;
+            
+            return (
+              <div className="flex items-start gap-2 my-2">
+                <span className="text-lg mt-0.5">🤖</span>
+                <div className="rounded-xl rounded-tl-none bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-800 max-w-[75%] shadow-sm whitespace-pre-wrap">
+                  {content}
+                </div>
               </div>
-            </div>
-          )}
-          UserMessage={(props) => (
-            <div className="flex items-start gap-2 my-1 justify-end">
-              <div className="rounded-xl rounded-tr-none bg-indigo-600 px-3 py-2 text-sm text-white max-w-[85%]">
-                <UserMessage {...props} />
+            );
+          }}
+          UserMessage={(props) => {
+            let content = '';
+            if (typeof props.message.content === 'string') {
+              content = props.message.content;
+            } else if (Array.isArray(props.message.content)) {
+              const textPart = (props.message.content as any[]).find((c: any) => c.type === 'text');
+              content = (textPart as any)?.text || '';
+            }
+            
+            // Only render if we have content
+            if (!content) return null;
+            
+            return (
+              <div className="flex items-start gap-2 my-2 justify-end">
+                <div className="rounded-xl rounded-tr-none bg-blue-600 px-3 py-2 text-sm text-white max-w-[75%] shadow-sm whitespace-pre-wrap">
+                  {content}
+                </div>
+                <span className="text-lg mt-0.5">👤</span>
               </div>
-              <span className="text-lg mt-0.5">👤</span>
-            </div>
-          )}
+            );
+          }}
         >
           {/* useChatContext is available here since we're inside CopilotChat */}
           <div className="px-4 py-2 border-b border-slate-100 bg-slate-50">

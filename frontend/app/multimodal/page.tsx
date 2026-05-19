@@ -2,7 +2,8 @@
 
 import { useState, useRef, useCallback } from "react";
 import { CopilotPopup } from "@copilotkit/react-ui";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable, useCopilotChat } from "@copilotkit/react-core";
+import { TextMessage, MessageRole } from "@copilotkit/runtime-client-gql";
 
 /**
  * Multimodal Attachments + Vision
@@ -30,6 +31,8 @@ export default function MultimodalPage() {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { appendMessage } = useCopilotChat();
 
   // Make the current image metadata readable to the agent
   useCopilotReadable({
@@ -146,6 +149,12 @@ export default function MultimodalPage() {
               onClick={() => {
                 setAnalyzing(true);
                 setAnalysis(null);
+                appendMessage(
+                  new TextMessage({
+                    content: "Please analyze this uploaded image in detail. Provide a comprehensive analysis including objects, colors, text, and insights.",
+                    role: MessageRole.User
+                  })
+                );
               }}
               className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
             >
