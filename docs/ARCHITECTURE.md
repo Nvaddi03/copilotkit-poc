@@ -131,11 +131,74 @@ sequenceDiagram
     UI->>User: Display results with 🏆 Best Price indicator
 ```
 
+## Declarative UI Flow (L4) - "Build a Wireless Dashboard"
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as React Frontend<br/>(declarative/page.tsx)
+    participant Action as useCopilotAction<br/>(buildDashboard)
+    participant Agent as LangGraph Agent<br/>(Backend)
+    participant Tools as Backend Tools<br/>(DB + Group By)
+    participant DB as SQLite Database
+    participant Components as React Components<br/>(KpiCard, ChartCard, DataTable)
+
+    User->>UI: "Build a wireless dashboard"
+    UI->>Action: Register buildDashboard action<br/>(parameters: title, stats, charts, tables, callouts)
+    UI->>Agent: Send user message via CopilotPopup
+    
+    Note over Agent: Agent analyzes request:<br/>"Need wireless data + dashboard layout"
+    
+    Agent->>Tools: wireless_summary()
+    Tools->>DB: SELECT COUNT(*), SUM(data_used_gb)...
+    DB-->>Tools: {subscribers: 50, total_gb: 1717, minutes: 88328}
+    Tools-->>Agent: Summary totals
+    
+    Agent->>Tools: group_by_count("wireless_customers", "plan_type")
+    Tools->>DB: SELECT plan_type, COUNT(*) GROUP BY plan_type
+    DB-->>Tools: [{Basic: 32}, {Premium: 18}]
+    Tools-->>Agent: Plan distribution data
+    
+    Agent->>Tools: group_by_sum("wireless_usage", "signup_month", "data_used_gb")
+    Tools->>DB: SELECT signup_month, SUM(data_used_gb) GROUP BY signup_month
+    DB-->>Tools: [{Jan: 120}, {Feb: 145}, {Mar: 167}...]
+    Tools-->>Agent: Monthly usage data
+    
+    Note over Agent: Agent decides:<br/>✓ Categorical data → PIE chart<br/>✓ Time series → BAR chart<br/>✓ Build complete payload
+    
+    Agent->>Action: buildDashboard({<br/>  title: "Wireless Analytics Dashboard",<br/>  stats: [<br/>    {label: "Total Subscribers", value: 50, trend: "up"},<br/>    {label: "Total Data (GB)", value: 1717}<br/>  ],<br/>  charts: [<br/>    {kind: "pie", title: "Plan Distribution", data: [...]},<br/>    {kind: "bar", title: "Monthly Usage", data: [...]}<br/>  ]<br/>})
+    
+    Action->>UI: handler() executes<br/>setDashboard(payload)
+    
+    UI->>Components: Render dashboard with data
+    Components->>Components: KpiCard: Apply gradient colors<br/>ChartCard: Route to GenPieChart/GenChart<br/>DataTable: Build HTML table
+    
+    Components-->>UI: Rendered dashboard HTML
+    UI-->>User: Display complete dashboard<br/>✅ KPI cards with gradients<br/>✅ Pie + Bar charts<br/>✅ AI insights
+    
+    Note over User,Components: Backend = Brain (decides WHAT)<br/>Frontend = Renderer (knows HOW)
+```
+
+### Key Concepts - Declarative UI
+
+| Layer | Role | Example |
+|-------|------|---------|
+| **User** | Describes intent | "Build a wireless dashboard" |
+| **Backend Agent** | Decides structure & data | Calls DB tools, chooses chart types ("pie", "bar"), structures payload |
+| **useCopilotAction** | Action contract | Defines `buildDashboard(title, stats, charts, tables, callouts)` |
+| **Frontend Handler** | State update | `setDashboard(payload)` → triggers React re-render |
+| **React Components** | Visual rendering | `<KpiCard>`, `<ChartCard>`, `<DataTable>` render with Tailwind styling |
+
+**Why "Declarative"?**  
+The agent **declares** the UI structure (stats array, charts array with `kind` property) without writing React/HTML code. Frontend components know **how** to render any structure the agent provides.
+
+---
+
 ## Component Architecture
 
 ```mermaid
 graph LR
-    subgraph "10 Pages - Different CopilotKit Features"
+    subgraph "11 Pages - Different CopilotKit Features"
         P1[Dashboard<br/>CopilotSidebar<br/>Charts + Observability]
         P2[Controlled GenUI<br/>CopilotPopup<br/>L3 Typed Render]
         P3[Declarative GenUI<br/>CopilotPopup<br/>L4 buildDashboard]

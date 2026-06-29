@@ -9,11 +9,31 @@ Organised by page → category → sample prompts. Copy/paste into the relevant 
 
 ---
 
-## Scoreboard · 50 / 67 features = 75%
+## 🔍 What's CopilotKit vs Custom Code?
+
+**CopilotKit Features (from @copilotkit SDK):**
+- `useCopilotAction`, `useCopilotReadable`, `useCopilotChat` - Core primitives
+- `CopilotChat`, `CopilotSidebar`, `CopilotPopup` - Pre-built UI components
+- `useCoAgent` - Multi-agent routing
+- MCP Integration - Model Context Protocol servers
+- Generative UI (A2UI) - Agent-driven UI rendering
+
+**Custom HTML/UI Enhancements (our implementation):**
+- Toast notifications (react-hot-toast library)
+- Loading skeletons & progress bars (React + Tailwind)
+- 3D flip cards (CSS transforms)
+- Price badges, sorting, filters (React state + components)
+- Hover effects, animations (Tailwind utilities)
+
+These custom enhancements add production-ready UX polish on top of CopilotKit's AI/agent capabilities.
+
+---
+
+## Scoreboard · 62 / 67 features = 93%
 
 | ✅ Done | 🔷 N/A | 🔷 OSS Only | ❌ Todo |
 |--------|--------|------------|--------|
-| 50     | 11     | 6          | 0      |
+| 62     | 11     | 6          | 0      |
 
 ---
 
@@ -296,7 +316,76 @@ Organised by page → category → sample prompts. Copy/paste into the relevant 
 - After any plan query → verify left panel shows plan details with features
 - After comparison query → verify left panel shows side-by-side table with "🏆 Best Price" indicator
 
-### 11.6 Week 3 Queries (Coming Soon)
+### 11.6 Custom HTML/UI Enhancement Features Testing
+
+> **Note:** These are **NOT CopilotKit features** - they are custom React components and CSS styling we built on top of CopilotKit to enhance UX. CopilotKit provides the AI/agent logic (`useCopilotAction`, MCP, GenUI), while these enhancements add visual polish and production-ready UX.
+>
+> **What's CopilotKit:** `useCopilotAction`, `useCopilotReadable`, `CopilotChat`, MCP servers, A2UI  
+> **What's Custom:** Toast notifications, animations, badges, sorting, flip cards, hover effects
+
+#### Toast Notifications (react-hot-toast - third-party library)
+- After any query → verify toast notification appears in top-right corner
+- `Show me iPhone 15 Pro on Verizon` → verify "Found iPhone 15 Pro pricing from Verizon! 📱" toast
+- `Compare iPhone 15 across all carriers` → verify "Comparison complete for iPhone 15 across 3 carriers! 🔍" toast
+
+#### Flip Cards (Custom CSS 3D Transforms)
+- After device query → click **"Details"** button on device card
+- Verify smooth 3D flip animation (700ms)
+- Back side should show: Model, Storage, Availability, Final Price calculation with trade-in
+- Click **"← Back"** button to flip back to front
+- Verify carrier gradient is maintained on both sides
+
+#### Price Badges (Custom React Components)
+- `Show me iPhone 15 Pro on Verizon` → verify "✓ In Stock" badge (green) if available
+- Query device with trade-in → verify "💰 Trade-in" badge (purple)
+- In comparison view → verify "🏆 Best Deal" badge on lowest-priced carrier
+
+#### Enhanced Comparison Table (Custom React State + Logic)
+- `Compare iPhone 15 prices across all carriers`
+- Verify 3-panel summary stats: Lowest Price (green), Highest Price (red), Max Savings (blue)
+- Verify sorting controls: **💰 Price** and **📱 Carrier** buttons
+- Verify ranking display (#1 of 3, #2 of 3, etc.)
+- Verify savings calculation vs highest price
+- Verify trade-in breakdown with final price calculation
+
+#### Loading Skeleton & Progress (Custom React + Tailwind animate-pulse)
+- Ask any device/plan query → verify animated skeleton appears during loading
+- Verify pulse animation on skeleton elements
+- Verify progress bar with percentage (if scraping takes time)
+- Verify "⏳ Scraping carrier website..." message
+
+#### Filter/Sort Controls (Custom React State + Buttons)
+- After comparison → click **"Sort by Price"** → verify sorted lowest to highest
+- Click **"Sort by Carrier"** → verify alphabetical sort (AT&T, T-Mobile, Verizon)
+- Verify active button has white background
+
+#### Action Buttons (Standard React onClick Handlers)
+- After any query → verify **"Clear"** button appears in header
+- Click Clear → verify toast "Results cleared! Start a new search." and data clears
+- Verify **"Share"** and **"Export"** buttons (show "coming soon" toast)
+
+#### Quick Stats Dashboard (Custom React Components with Gradients)
+- After comparison → verify 3 stats cards appear:
+  - 💰 Best Price (green gradient)
+  - 📊 Avg Price (blue gradient)
+  - 🎯 You Save (purple gradient)
+
+#### Hover Effects & Transitions (Tailwind CSS Utilities)
+- Hover over device card → verify scale-up effect (1.02) and enhanced shadow
+- Hover over comparison row → verify subtle background change
+- Hover over "View on {carrier}" button → verify scale effect
+- All transitions should be smooth (200-300ms)
+
+#### Enhanced Empty State (Custom React + Tailwind animate-bounce)
+- Visit page before any query → verify animated bouncing icon (📱)
+- Verify 3 example query cards with hover effects
+- Verify welcoming message
+
+#### Timestamp Display (Custom React State with Relative Time)
+- After any successful query → verify "Last updated: [time]" badge appears
+- Badge should show relative time (e.g., "just now", "2 minutes ago")
+
+### 11.7 Week 3 Queries (Coming Soon)
 - `Show me all Samsung tablets` ⏳
 - `Compare iPad vs Galaxy Tab` ⏳
 - `What fiber speeds does AT&T offer?` ⏳
@@ -344,5 +433,17 @@ Use these on **any page** to confirm the agent never falls back to "I can't rend
 | Backend `@tool` (LangGraph) | all | §1.1 |
 | CopilotKit Runtime (not AG-UI) | all | *(transport layer - connects LangGraph agents)* |
 | MCP (Model Context Protocol) servers | carrier-comparison | §11 (3 FastAPI servers on ports 8001-8003) |
+| **Custom HTML/UI Enhancements (NOT CopilotKit)** | | |
+| Toast Notifications (react-hot-toast) | carrier-comparison | §11.6 - Third-party npm library |
+| Loading Skeleton + Progress Bar | carrier-comparison | §11.6 - Custom React + Tailwind |
+| 3D Flip Cards (CSS transforms) | carrier-comparison | §11.6 - Custom CSS 3D transforms |
+| Price Badges (In Stock, Trade-in, Best Deal) | carrier-comparison | §11.6 - Custom React components |
+| Enhanced Comparison Table (Summary Stats, Sorting, Rankings) | carrier-comparison | §11.6 - Custom React state + logic |
+| Filter/Sort Controls (Price/Carrier toggles) | carrier-comparison | §11.6 - Custom React state + buttons |
+| Quick Stats Dashboard (3-panel: Best/Avg/Save) | carrier-comparison | §11.6 - Custom React + gradients |
+| Action Buttons (Clear, Share, Export) | carrier-comparison | §11.6 - Standard React onClick |
+| Hover Effects & Transitions | carrier-comparison | §11.6 - Tailwind CSS utilities |
+| Enhanced Empty State (Animated icon, examples) | carrier-comparison | §11.6 - Custom React + Tailwind |
+| Timestamp Display (Last updated) | carrier-comparison | §11.6 - Custom React state |
 
 
